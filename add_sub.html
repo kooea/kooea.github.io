@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="优学习 - 专业的学习资料生成平台，免费提供数学加减法、语文拼音、英语单词等练习题生成工具，支持自定义题型、难度、数量，一键打印。">
+    <meta name="keywords" content="学习资料生成器,加减法练习题,数学练习题,语文拼音,英语单词,优学习,在线打印">
+    <meta name="author" content="优学习">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#1a1a2e">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="优学习 - 习惯是最好的老师">
+    <meta property="og:description" content="专业的学习资料生成平台，免费提供数学加减法、语文拼音、英语单词等练习题生成工具">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="zh_CN">
+    <meta property="og:url" content="">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="优学习 - 习惯是最好的老师">
+    <meta name="twitter:description" content="专业的学习资料生成平台，免费提供数学加减法、语文拼音、英语单词等练习题生成工具">
+    
+    <!-- Canonical -->
+    <link rel="canonical" href="">
+    
+    <title>优学习 - 习惯是最好的老师 | 专业学习资料生成器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: linear-gradient(90deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 0 20px;
+        }
+
+        .logo-title {
+            padding: 15px 0;
+        }
+
+        .main-title {
+            font-size: 26px;
+            font-weight: bold;
+            background: linear-gradient(90deg, #00d9ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 3px;
+            margin-right: 15px;
+        }
+
+        .sub-title {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            letter-spacing: 1px;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            margin-left: 60px;
+        }
+
+        .nav-item {
+            position: relative;
+            padding: 20px 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .nav-item.active {
+            background: rgba(0,217,255,0.2);
+            border-bottom: 3px solid #00d9ff;
+        }
+
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: #1a1a2e;
+            min-width: 200px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            border-radius: 0 0 10px 10px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover .dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            padding: 12px 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(0,217,255,0.2);
+            border-left-color: #00d9ff;
+            padding-left: 30px;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        main {
+            flex: 1;
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+            width: 100%;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+            overflow-x: auto;
+        }
+
+        .preview-section {
+            flex: 1;
+            min-width: 0;
+            overflow-x: auto;
+        }
+
+        #paperContainer {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .config-section {
+            width: 350px;
+            flex-shrink: 0;
+        }
+
+        .panel {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            background: linear-gradient(90deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 20px 25px;
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-body {
+            padding: 25px;
+        }
+
+        .tips-section {
+            margin-top: 20px;
+        }
+
+        .tips-panel {
+            background: #fff3e0;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #ffe0b2;
+        }
+
+        .tips-header {
+            background: linear-gradient(90deg, #ff9800 0%, #f57c00 100%);
+            color: white;
+            padding: 15px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tips-body {
+            padding: 20px;
+            color: #5d4037;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .paper-preview {
+            width: 794px;
+            height: 1123px;
+            background: white;
+            padding: 57px 45px;
+            font-size: 14px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            margin: 0 auto;
+            box-sizing: border-box;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .paper-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .paper-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            font-size: 14px;
+            color: #666;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        .info-name {
+            padding-left: 50px;
+        }
+
+        .info-date {
+            padding-right: 50px;
+        }
+
+        .problems-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px 17px;
+        }
+
+        .problems-grid.vertical-grid {
+            grid-template-columns: repeat(4, 1fr);
+            gap: 28px 20px;
+        }
+
+        .problem-item {
+            text-align: left;
+            padding: 12px 4px 12px 10px;
+            border-bottom: 2px dotted #ccc;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .problem-item .underline {
+            display: inline-block;
+            min-width: 45px;
+            border-bottom: 1px solid #333;
+            margin: 0 1px;
+            vertical-align: baseline;
+            font-size: 0;
+            line-height: 0;
+            position: relative;
+            bottom: -5px;
+        }
+
+        .problem-item.vertical {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: flex-end;
+            padding: 8px 10px 8px 10px;
+            border-bottom: none;
+            line-height: 1.4;
+            font-size: 14px;
+            min-height: 70px;
+        }
+
+        .problem-item.vertical .vert-num1 {
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .problem-item.vertical .vert-op {
+            font-size: 14px;
+            margin-right: 4px;
+        }
+
+        .problem-item.vertical .vert-num2 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .problem-item.vertical .vert-line {
+            width: 100%;
+            border-bottom: 1px solid #333;
+            margin: 2px 0;
+        }
+
+        .problem-item.vertical .vert-result {
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+        }
+
+        .problem-item.vertical .vert-digit {
+            display: inline-block;
+            width: 14px;
+            text-align: center;
+            margin: 0 4px;
+            box-sizing: border-box;
+        }
+
+        .paper-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: absolute;
+            bottom: 35px;
+            left: 45px;
+            right: 45px;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .paper-footer .website-url {
+            flex: 1;
+            text-align: left;
+        }
+
+        .paper-footer .page-number {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .paper-footer .unique-id {
+            flex: 1;
+            text-align: right;
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 80px;
+            width: 50px;
+            height: 50px;
+            background: #43a047;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .back-to-top svg {
+            width: 24px;
+            height: 24px;
+            stroke: white;
+            stroke-width: 2.5;
+            fill: none;
+        }
+
+        .config-group {
+            margin-bottom: 25px;
+        }
+
+        .config-label {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .config-label::before {
+            content: '';
+            width: 4px;
+            height: 18px;
+            background: linear-gradient(180deg, #667eea, #764ba2);
+            border-radius: 2px;
+        }
+
+        .radio-group, .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .radio-item, .checkbox-item {
+            position: relative;
+        }
+
+        .radio-item input, .checkbox-item input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .radio-item label, .checkbox-item label {
+            display: block;
+            padding: 12px 15px;
+            background: #f5f6fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .radio-item input:checked + label, .checkbox-item input:checked + label {
+            background: #43a047;
+            color: white;
+            border-color: transparent;
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(67, 160, 71, 0.4);
+        }
+
+        .select-group {
+            width: 100%;
+            padding: 12px 15px;
+            background: #f5f6fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+        }
+
+        .select-group:focus {
+            outline: none;
+            border-color: #43a047;
+            box-shadow: 0 0 0 3px rgba(67, 160, 71, 0.2);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-generate {
+            background: #43a047;
+            color: white;
+        }
+
+        .btn-generate:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(67, 160, 71, 0.4);
+        }
+
+        .btn-print {
+            background: #2196f3;
+            color: white;
+        }
+
+        .btn-print:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(33, 150, 243, 0.4);
+        }
+
+        footer {
+            background: linear-gradient(90deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+            margin-top: auto;
+        }
+
+        footer p {
+            font-size: 14px;
+        }
+
+        @media (max-width: 1024px) {
+            .content-wrapper {
+                flex-direction: column;
+            }
+
+            .config-section {
+                width: 100%;
+            }
+
+            .problems-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-wrap: wrap;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            nav {
+                display: none;
+                width: 100%;
+                flex-direction: column;
+            }
+
+            nav.active {
+                display: flex;
+            }
+
+            .nav-item {
+                width: 100%;
+                padding: 15px 20px;
+                border-bottom: 1px solid rgba(255,255,255,0.1);
+            }
+
+            .dropdown {
+                position: static;
+                box-shadow: none;
+                background: rgba(0,0,0,0.2);
+                display: none;
+            }
+
+            .nav-item:hover .dropdown {
+                display: block;
+            }
+
+            .problems-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px 15px;
+            }
+
+            .problem-item {
+                font-size: 14px;
+                padding: 8px 3px;
+            }
+
+            .paper-preview {
+                padding: 25px 15px;
+            }
+
+            .paper-title {
+                font-size: 18px;
+                margin-bottom: 20px;
+            }
+
+            .radio-group, .checkbox-group {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+        }
+
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 0;
+            }
+
+            html, body {
+                margin: 0;
+                padding: 0;
+                width: 794px;
+                height: auto;
+            }
+
+            body {
+                background: white;
+            }
+
+            header, footer, .config-section, .mobile-menu-btn {
+                display: none !important;
+            }
+
+            main {
+                margin: 0;
+                padding: 0;
+                max-width: none;
+                width: 794px;
+            }
+
+            .content-wrapper {
+                display: block;
+            }
+
+            .preview-section {
+                width: 100%;
+                max-width: none;
+            }
+
+            .panel {
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            #paperContainer {
+                display: block;
+            }
+
+            .paper-preview {
+                width: 794px;
+                height: 1123px;
+                margin: 0;
+                border: none;
+                box-shadow: none;
+                padding: 57px 45px;
+                box-sizing: border-box;
+                overflow: hidden;
+                position: relative;
+            }
+
+            .paper-preview:last-child {
+                page-break-after: auto;
+            }
+
+            .problems-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 10px 23px;
+            }
+
+            .problem-item {
+                padding: 14px 4px 14px 10px;
+            }
+
+            .paper-footer {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                position: absolute;
+                bottom: 20px;
+                left: 45px;
+                right: 45px;
+                font-size: 12px;
+                color: #999;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo-title">
+                <a href="index.html" style="text-decoration: none;">
+                    <span class="main-title">优学习</span>
+                    <span class="sub-title">习惯是最好的老师</span>
+                </a>
+            </div>
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
+            <nav id="mainNav">
+                <div class="nav-item active" data-subject="chinese">
+                    语文
+                    <div class="dropdown">
+                        <div class="dropdown-item">看拼音写汉字</div>
+                        <div class="dropdown-item">阅读理解</div>
+                        <div class="dropdown-item">作文素材</div>
+                    </div>
+                </div>
+                <div class="nav-item" data-subject="math">
+                    数学
+                    <div class="dropdown">
+                        <div class="dropdown-item" onclick="window.location.href='add_sub.html'">加减法练习题</div>
+                        <div class="dropdown-item" onclick="window.location.href='mult.html'">乘法练习题</div>
+                        <div class="dropdown-item">除法练习题</div>
+                        <div class="dropdown-item">综合运算</div>
+                    </div>
+                </div>
+                <div class="nav-item" data-subject="english">
+                    英语
+                    <div class="dropdown">
+                        <div class="dropdown-item">单词默写</div>
+                        <div class="dropdown-item">短文填空</div>
+                        <div class="dropdown-item">翻译练习</div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="content-wrapper">
+            <article class="preview-section" aria-label="学习资料预览区域">
+                <h1 style="position: absolute; left: -9999px;">优学习 - 加减法练习题生成器</h1>
+                <div id="paperContainer">
+                    <div class="paper-preview" id="paperPreview">
+                        <div class="paper-title" id="paperTitle">加减法练习题</div>
+                        <div class="paper-info">
+                            <span class="info-name">姓名: ____________</span>
+                            <span class="info-class">班级: ____________</span>
+                            <span class="info-date">日期: ____________</span>
+                        </div>
+                        <div class="problems-grid" id="problemsGrid" role="grid" aria-label="练习题列表">
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <aside class="config-section" aria-label="功能配置区域">
+                <div class="panel">
+                    <div class="panel-header">
+                        <span>⚙️</span> 功能配置
+                    </div>
+                    <div class="panel-body">
+                        <div class="config-group">
+                            <div class="config-label">运算类型</div>
+                            <select id="operationType" class="select-group">
+                                <option value="">请选择</option>
+                                <option value="add" selected>加法</option>
+                                <option value="sub">减法</option>
+                                <option value="mixed">加减混合</option>
+                            </select>
+                        </div>
+
+                        <div class="config-group">
+                            <div class="config-label">题型构成</div>
+                            <select id="problemType" class="select-group" onchange="updateRangeOptions(true)">
+                                <option value="">请选择</option>
+                                <option value="1-1">1位数与1位数</option>
+                                <option value="1-2">1位数与2位数</option>
+                                <option value="2-1">2位数与1位数</option>
+                                <option value="2-2" selected>2位数与2位数</option>
+                                <option value="2-3">2位数与3位数</option>
+                                <option value="3-2">3位数与2位数</option>
+                                <option value="3-3">3位数与3位数</option>
+                            </select>
+                        </div>
+
+                        <div class="config-group">
+                            <div class="config-label">结果范围</div>
+                            <select id="rangeSelect" class="select-group">
+                                <option value="">请选择</option>
+                                <option value="100" selected>100以内</option>
+                                <option value="198">198以内</option>
+                            </select>
+                        </div>
+
+                        <div class="config-group">
+                            <div class="config-label">题型模式</div>
+                            <select id="problemMode" class="select-group">
+                                <option value="operation" selected>运算</option>
+                                <option value="fill">填空</option>
+                                <option value="vertical">竖式</option>
+                            </select>
+                        </div>
+
+                        <div class="config-group">
+                            <div class="config-label" id="quantityLabel">题目页数（每页60题）</div>
+                            <select id="quantitySelect" class="select-group">
+                                <option value="">请选择</option>
+                                <option value="1">1页</option>
+                                <option value="2" selected>2页</option>
+                                <option value="3">3页</option>
+                                <option value="4">4页</option>
+                                <option value="5">5页</option>
+                                <option value="6">6页</option>
+                                <option value="7">7页</option>
+                                <option value="8">8页</option>
+                                <option value="9">9页</option>
+                                <option value="10">10页</option>
+                                <option value="12">12页</option>
+                                <option value="15">15页</option>
+                                <option value="20">20页</option>
+                            </select>
+                        </div>
+
+                        <div class="btn-group">
+                            <button class="btn btn-generate" onclick="generateProblems()">
+                                <span>📝</span> 生成题目
+                            </button>
+                            <button class="btn btn-print" onclick="printPaper()">
+                                <span>🖨️</span> 打印题目
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tips-section">
+                    <div class="tips-panel">
+                        <div class="tips-header">
+                            💡 温馨提示
+                        </div>
+                        <div class="tips-body">
+                            家长批改作业可以使用豆包爱学、作业帮等工具快速扫描批改哦，省心又省力，孩子的进步离不开家长的陪伴与鼓励，坚信习惯是最好的老师！
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </section>
+    </main>
+
+    <footer>
+        <p>Copyright © <span id="current-year">2026</span> Youxuexi. All Rights Reserved</p>
+    </footer>
+
+    <button class="back-to-top" id="backToTop" onclick="scrollToTop()">
+        <svg viewBox="0 0 24 24">
+            <polyline points="18 15 12 9 6 15"></polyline>
+        </svg>
+    </button>
+
+    <!-- 结构化数据 -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "优学习",
+        "description": "专业的学习资料生成平台，免费提供数学加减法、语文拼音、英语单词等练习题生成工具，支持自定义题型、难度、数量，一键打印。",
+        "applicationCategory": "EducationApplication",
+        "operatingSystem": "Web",
+        "url": "",
+        "screenshot": "",
+        "author": {
+            "@type": "Organization",
+            "name": "优学习"
+        },
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "CNY"
+        },
+        "featureList": [
+            "数学加减法练习题生成",
+            "自定义题型难度和数量",
+            "一键打印学习资料",
+            "语文拼音练习",
+            "英语单词练习"
+        ]
+    }
+    </script>
+
+    <script>
+        function toggleMobileMenu() {
+            const nav = document.getElementById('mainNav');
+            nav.classList.toggle('active');
+        }
+
+        function showModule(module) {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.closest('.nav-item').classList.add('active');
+
+            const titles = {
+                'addition': '加减法练习题',
+                'multiplication': '乘法练习题',
+                'division': '除法练习题',
+                'mixed': '综合运算'
+            };
+
+            document.getElementById('paperTitle').textContent = titles[module] || '练习题';
+            generateProblems();
+        }
+
+        function updateRangeOptions(autoSelectFirst = false) {
+            const problemType = document.getElementById('problemType').value;
+            const rangeSelect = document.getElementById('rangeSelect');
+            rangeSelect.innerHTML = '<option value="">请选择</option>';
+
+            if (!problemType) return;
+
+            const ranges = {
+                '1-1': [{value: '9', text: '9以内'}, {value: '18', text: '18以内'}],
+                '1-2': [{value: '20', text: '20以内'}, {value: '100', text: '100以内'}],
+                '2-1': [{value: '99', text: '99以内'}, {value: '100', text: '100以内'}],
+                '2-2': [{value: '100', text: '100以内'}, {value: '198', text: '198以内'}],
+                '2-3': [{value: '1000', text: '1000以内'}],
+                '3-2': [{value: '1000', text: '1000以内'}],
+                '3-3': [{value: '1000', text: '1000以内'}, {value: '1998', text: '1998以内'}]
+            };
+
+            if (ranges[problemType]) {
+                let firstValue = '';
+                ranges[problemType].forEach((item) => {
+                    const option = document.createElement('option');
+                    option.value = item.value;
+                    option.textContent = item.text;
+                    if (!firstValue) firstValue = item.value;
+                    rangeSelect.appendChild(option);
+                });
+                if (autoSelectFirst && firstValue) {
+                    rangeSelect.value = firstValue;
+                }
+            }
+        }
+
+        function updateQuantityLabel() {
+            const problemMode = document.getElementById('problemMode').value;
+            const problemsPerPage = problemMode === 'vertical' ? 28 : 60;
+            const quantityLabel = document.getElementById('quantityLabel');
+            quantityLabel.textContent = `题目页数（每页${problemsPerPage}题）`;
+        }
+
+        let problemsCache = [];
+        let selectedPages = 0;
+        let savedDynamicTitle = '';
+
+        function formatDigits(num) {
+            return num.toString().split('').map(d => `<span class="vert-digit">${d}</span>`).join('');
+        }
+
+        function formatBlanks(count) {
+            return Array(count).fill('<span class="vert-digit">&nbsp;</span>').join('');
+        }
+
+        function generateProblems() {
+            updateQuantityLabel();
+            const operationType = document.getElementById('operationType').value;
+            const problemMode = document.getElementById('problemMode').value;
+            const problemType = document.getElementById('problemType').value;
+            const rangeValue = document.getElementById('rangeSelect').value;
+            const pages = parseInt(document.getElementById('quantitySelect').value);
+            const problemsPerPage = problemMode === 'vertical' ? 28 : 60;
+            const quantity = pages * problemsPerPage;
+            selectedPages = pages;
+
+            // 获取配置选项的文本
+            const operationTypeText = document.querySelector('#operationType option:checked')?.textContent || '';
+            const problemTypeText = document.querySelector('#problemType option:checked')?.textContent || '';
+            const rangeValueText = document.querySelector('#rangeSelect option:checked')?.textContent || '';
+            const problemModeText = document.querySelector('#problemMode option:checked')?.textContent || '';
+            const dynamicTitle = `${problemTypeText} ${operationTypeText} ${problemModeText} (${rangeValueText})`;
+            savedDynamicTitle = dynamicTitle;
+
+            const missing = [];
+            if (!operationType) missing.push('运算类型');
+            if (!problemMode) missing.push('题型模式');
+            if (!problemType) missing.push('题型构成');
+            if (!rangeValue) missing.push('结果范围');
+            if (!pages) missing.push('题目页数');
+
+            if (missing.length > 0) {
+                alert('请选择：' + missing.join('、'));
+                return;
+            }
+
+            const range = parseInt(rangeValue);
+            problemsCache = [];
+            const digits = problemType.split('-').map(Number);
+
+            const getRandomByDigits = (d) => {
+                const min = Math.pow(10, d - 1);
+                const max = Math.pow(10, d) - 1;
+                return Math.floor(Math.random() * (max - min + 1)) + min;
+            };
+
+            const validateDigits = (num, expectedDigits) => {
+                const actualDigits = num.toString().length;
+                return actualDigits === expectedDigits;
+            };
+
+            const validateResult = (result, maxRange) => {
+                return result >= 0 && result <= maxRange;
+            };
+
+            const addCount = operationType === 'mixed' ? Math.ceil(quantity / 2) : quantity;
+            const subCount = operationType === 'mixed' ? Math.floor(quantity / 2) : 0;
+            let addGenerated = 0;
+            let subGenerated = 0;
+
+            for (let i = 0; i < quantity; i++) {
+                let num1, num2, result;
+                let attempts = 0;
+                const maxAttempts = 500;
+                let isValid = false;
+                let currentOp;
+
+                if (operationType === 'mixed') {
+                    if (addGenerated < addCount && subGenerated < subCount) {
+                        currentOp = Math.random() < 0.5 ? '+' : '-';
+                    } else if (addGenerated < addCount) {
+                        currentOp = '+';
+                    } else {
+                        currentOp = '-';
+                    }
+                } else if (operationType === 'add') {
+                    currentOp = '+';
+                } else {
+                    currentOp = '-';
+                }
+
+                while (!isValid && attempts < maxAttempts) {
+                    if (currentOp === '+') {
+                        num1 = getRandomByDigits(digits[0]);
+                        num2 = getRandomByDigits(digits[1]);
+                        result = num1 + num2;
+                        isValid = validateDigits(num1, digits[0]) &&
+                                  validateDigits(num2, digits[1]) &&
+                                  validateResult(result, range);
+                    } else {
+                        num1 = getRandomByDigits(digits[0]);
+                        num2 = getRandomByDigits(digits[1]);
+                        result = num1 - num2;
+                        isValid = validateDigits(num1, digits[0]) &&
+                                  validateDigits(num2, digits[1]) &&
+                                  validateResult(result, range);
+                    }
+                    attempts++;
+                }
+
+                let displayText;
+                if (!isValid) {
+                    if (currentOp === '+') {
+                        num1 = Math.min(getRandomByDigits(digits[0]), Math.floor(range / 2));
+                        num2 = Math.min(getRandomByDigits(digits[1]), range - num1);
+                        result = num1 + num2;
+                    } else {
+                        num1 = getRandomByDigits(digits[0]);
+                        num2 = Math.min(getRandomByDigits(digits[1]), num1, range);
+                        result = num1 - num2;
+                    }
+                }
+
+                if (problemMode === 'fill') {
+                    const hideFirst = Math.random() < 0.5;
+                    if (currentOp === '+') {
+                        if (hideFirst) {
+                            displayText = `<span class="underline"></span> + ${num2} = ${result}`;
+                        } else {
+                            displayText = `${num1} + <span class="underline"></span> = ${result}`;
+                        }
+                    } else {
+                        if (hideFirst) {
+                            displayText = `<span class="underline"></span> - ${num2} = ${result}`;
+                        } else {
+                            displayText = `${num1} - <span class="underline"></span> = ${result}`;
+                        }
+                    }
+                } else if (problemMode === 'vertical') {
+                    displayText = `${num1}${currentOp === '+' ? '+' : '-'}${num2}=${result}`;
+                } else {
+                    displayText = `${num1} ${currentOp} ${num2} = `;
+                }
+
+                let displayHTML;
+                if (problemMode === 'vertical') {
+                    const opSymbol = currentOp === '+' ? '+' : '-';
+                    const num1Digits = num1.toString().length;
+                    const num2Digits = num2.toString().length;
+                    const underscoreCount = digits[0] + 1;
+                    const spacerCount = num1Digits - num2Digits;
+                    let spacer = '';
+                    for (let i = 0; i < spacerCount; i++) {
+                        spacer += '<span class="vert-digit">&nbsp;</span>';
+                    }
+                    displayHTML = `
+                        <div class="vert-num1">
+                            ${formatDigits(num1)}
+                        </div>
+                        <div class="vert-num2">
+                            <span class="vert-op">${opSymbol}</span>
+                            ${spacer}
+                            ${formatDigits(num2)}
+                        </div>
+                        <div class="vert-line"></div>
+                        <div class="vert-result">${formatBlanks(underscoreCount)}</div>
+                    `;
+                } else {
+                    displayHTML = displayText;
+                }
+
+                problemsCache.push({ num1, num2, operator: currentOp, result, displayText, displayHTML, digitCount: digits[0] });
+                addGenerated = currentOp === '+' ? addGenerated + 1 : addGenerated;
+                subGenerated = currentOp === '-' ? subGenerated + 1 : subGenerated;
+            }
+
+            const container = document.getElementById('paperContainer');
+            const totalPages = Math.ceil(quantity / problemsPerPage);
+
+            const now = new Date();
+            const baseId = now.getFullYear().toString().slice(-2) +
+                          String(now.getMonth() + 1).padStart(2, '0') +
+                          String(now.getDate()).padStart(2, '0') +
+                          String(now.getHours()).padStart(2, '0') +
+                          String(now.getMinutes()).padStart(2, '0') +
+                          String(now.getSeconds()).padStart(2, '0');
+
+            container.innerHTML = '';
+
+            for (let page = 0; page < totalPages; page++) {
+                const pagePaper = document.createElement('div');
+                pagePaper.className = 'paper-preview';
+                const pageUniqueId = `${baseId}${page + 1}`;
+                const verticalClass = problemMode === 'vertical' ? ' vertical' : '';
+                const verticalGridClass = problemMode === 'vertical' ? ' vertical-grid' : '';
+                pagePaper.innerHTML = `
+                    <div class="paper-title" id="paperTitle">${dynamicTitle}</div>
+                    <div class="paper-info">
+                        <span class="info-name">姓名: ____________</span>
+                        <span class="info-class">班级: ____________</span>
+                        <span class="info-date">日期: ____________</span>
+                    </div>
+                    <div class="problems-grid${verticalGridClass}">
+                        ${problemsCache.slice(page * problemsPerPage, (page + 1) * problemsPerPage).map(p => `<div class="problem-item${verticalClass}">${problemMode === 'vertical' ? p.displayHTML : p.displayText}</div>`).join('')}
+                    </div>
+                    <div class="paper-footer">
+                        <span class="website-url">© 优学习 www.youxuexi.com</span>
+                        <span class="page-number">第 ${page + 1} 页</span>
+                        <span class="unique-id">编号: ${pageUniqueId}</span>
+                    </div>
+                `;
+                container.appendChild(pagePaper);
+            }
+        }
+
+        function refreshDisplay() {
+            if (problemsCache.length === 0) return;
+
+            const problemMode = document.getElementById('problemMode').value;
+            const container = document.getElementById('paperContainer');
+            const problemsPerPage = problemMode === 'vertical' ? 28 : 60;
+            const totalPages = selectedPages;
+            const displayQuantity = totalPages * problemsPerPage;
+            const displayProblems = problemsCache.slice(0, displayQuantity);
+
+            container.innerHTML = '';
+
+            for (let page = 0; page < totalPages; page++) {
+                const pagePaper = document.createElement('div');
+                pagePaper.className = 'paper-preview';
+                const verticalClass = problemMode === 'vertical' ? ' vertical' : '';
+                const verticalGridClass = problemMode === 'vertical' ? ' vertical-grid' : '';
+
+                const pageProblems = displayProblems.slice(page * problemsPerPage, (page + 1) * problemsPerPage);
+                let itemsHTML = '';
+
+                if (problemMode === 'fill') {
+                    pageProblems.forEach(problem => {
+                        const hideFirst = Math.random() < 0.5;
+                        if (problem.operator === '+') {
+                            if (hideFirst) {
+                                itemsHTML += `<div class="problem-item"><span class="underline"></span> + ${problem.num2} = ${problem.result}</div>`;
+                            } else {
+                                itemsHTML += `<div class="problem-item">${problem.num1} + <span class="underline"></span> = ${problem.result}</div>`;
+                            }
+                        } else {
+                            if (hideFirst) {
+                                itemsHTML += `<div class="problem-item"><span class="underline"></span> - ${problem.num2} = ${problem.result}</div>`;
+                            } else {
+                                itemsHTML += `<div class="problem-item">${problem.num1} - <span class="underline"></span> = ${problem.result}</div>`;
+                            }
+                        }
+                    });
+                } else if (problemMode === 'vertical') {
+                    pageProblems.forEach(problem => {
+                        const opSymbol = problem.operator === '+' ? '+' : '-';
+                        const num1Digits = problem.num1.toString().length;
+                        const num2Digits = problem.num2.toString().length;
+                        const underscoreCount = problem.digitCount + 1;
+                        const spacerCount = num1Digits - num2Digits;
+                        let spacer = '';
+                        for (let i = 0; i < spacerCount; i++) {
+                            spacer += '<span class="vert-digit">&nbsp;</span>';
+                        }
+                        itemsHTML += `
+                            <div class="problem-item vertical">
+                                <div class="vert-num1">${formatDigits(problem.num1)}</div>
+                                <div class="vert-num2"><span class="vert-op">${opSymbol}</span>${spacer}${formatDigits(problem.num2)}</div>
+                                <div class="vert-line"></div>
+                                <div class="vert-result">${formatBlanks(underscoreCount)}</div>
+                            </div>`;
+                    });
+                } else {
+                    pageProblems.forEach(problem => {
+                        itemsHTML += `<div class="problem-item">${problem.num1} ${problem.operator} ${problem.num2} = </div>`;
+                    });
+                }
+
+                pagePaper.innerHTML = `
+                    <div class="paper-title">${savedDynamicTitle}</div>
+                    <div class="paper-info">
+                        <span class="info-name">姓名: ____________</span>
+                        <span class="info-class">班级: ____________</span>
+                        <span class="info-date">日期: ____________</span>
+                    </div>
+                    <div class="problems-grid${verticalGridClass}">${itemsHTML}</div>
+                    <div class="paper-footer">
+                        <span class="website-url">© 优学习 www.youxuexi.com</span>
+                        <span class="page-number">第 ${page + 1} 页</span>
+                        <span class="unique-id">编号: ${Date.now().toString().slice(-8)}</span>
+                    </div>
+                `;
+                container.appendChild(pagePaper);
+            }
+        }
+
+        function printPaper() {
+            window.print();
+        }
+
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // 监听滚动事件，显示/隐藏回到顶部按钮
+        window.addEventListener('scroll', function() {
+            const backToTopBtn = document.getElementById('backToTop');
+            if (window.scrollY > 300) {
+                backToTopBtn.classList.add('visible');
+            } else {
+                backToTopBtn.classList.remove('visible');
+            }
+        });
+
+        // 动态定位回到顶部按钮，与config-section左边对齐
+        function positionBackToTopBtn() {
+            const configSection = document.querySelector('.config-section');
+            const backToTopBtn = document.getElementById('backToTop');
+            
+            if (configSection && backToTopBtn) {
+                const rect = configSection.getBoundingClientRect();
+                backToTopBtn.style.left = rect.left + 'px';
+            }
+        }
+
+        // 页面加载时和窗口大小改变时重新定位
+        window.addEventListener('load', positionBackToTopBtn);
+        window.addEventListener('resize', positionBackToTopBtn);
+        window.addEventListener('load', updateQuantityLabel);
+
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                if (e.target.classList.contains('dropdown-item')) {
+                    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                }
+            });
+        });
+
+        // 自动更新版权年份
+        document.addEventListener('DOMContentLoaded', function() {
+            const yearSpan = document.getElementById('current-year');
+            if (yearSpan) {
+                yearSpan.textContent = new Date().getFullYear();
+            }
+        });
+    </script>
+</body>
+</html>
