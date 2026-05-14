@@ -1,1 +1,1347 @@
 
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>小学生英语学习乐园</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <!-- 配置Tailwind自定义颜色和字体 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5', // 主色调：紫色
+                        secondary: '#F59E0B', // 辅助色：橙色
+                        accent: '#10B981', // 强调色：绿色
+                        danger: '#EF4444', // 危险/删除色：红色
+                        light: '#F3F4F6', // 浅色背景
+                        dark: '#1F2937' // 深色文本
+                    },
+                    fontFamily: {
+                        sans: ['Microsoft YaHei', '微软雅黑', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .bounce-hover {
+                transition: transform 0.3s ease;
+            }
+            .bounce-hover:hover {
+                transform: translateY(-5px);
+                animation: bounce 0.5s infinite alternate;
+            }
+            .card-flip {
+                perspective: 1000px;
+            }
+            .card-inner {
+                transition: transform 0.6s;
+                transform-style: preserve-3d;
+            }
+            .card-flipped .card-inner {
+                transform: rotateY(180deg);
+            }
+            .card-front, .card-back {
+                backface-visibility: hidden;
+            }
+            .card-back {
+                transform: rotateY(180deg);
+            }
+            .float-animation {
+                animation: float 3s ease-in-out infinite;
+            }
+            .pulse-animation {
+                animation: pulse 2s infinite;
+            }
+            .touch-target {
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: transparent;
+            }
+            .touch-expand {
+                position: relative;
+            }
+            .touch-expand::after {
+                content: '';
+                position: absolute;
+                top: -10px;
+                left: -10px;
+                right: -10px;
+                bottom: -10px;
+                z-index: 1;
+                pointer-events: auto;
+            }
+        }
+        
+        @keyframes bounce {
+            from { transform: translateY(-5px); }
+            to { transform: translateY(-10px); }
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(79, 70, 229, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-purple-50 min-h-screen font-sans text-dark flex flex-col">
+    <!-- 顶部导航 - 只保留返回按钮和管理员按钮 -->
+    <header class="bg-primary/90 text-white shadow-lg backdrop-blur-sm sticky top-0 z-50 relative h-16">
+        <div class="container mx-auto px-4 h-full">
+            <!-- 左侧：返回按钮 -->
+            <div class="absolute left-4 top-1/2 transform -translate-y-1/2">
+                <button id="backBtn" class="mr-2 bg-white/20 hover:bg-white/30 text-white py-1.5 px-3 rounded-full shadow-md transition-all duration-300 flex items-center hidden touch-target">
+                    <i class="fa fa-arrow-left"></i>
+                    <span id="backBtnText" class="ml-1">返回</span>
+                </button>
+            </div>
+            
+            <!-- 右侧：管理员按钮 -->
+            <div class="absolute right-4 top-1/2 transform -translate-y-1/2">
+                <button id="adminBtn" class="bg-secondary hover:bg-secondary/80 text-white py-2 px-4 rounded-full shadow-md transition-all duration-300 flex items-center space-x-2 touch-target">
+                    <i class="fa fa-cog"></i>
+                    <span>管理员</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 flex-grow">
+        <!-- 首页/单元选择界面 -->
+        <section id="unitSelection" class="py-8">
+            <div class="text-center mb-12">
+                <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-primary mb-4">选择学习单元</h2>
+                <p class="text-gray-600 text-lg max-w-2xl mx-auto">点击下面的单元卡片，开始你的英语学习之旅吧！</p>
+            </div>
+            
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                <!-- 单元卡片将通过JS动态生成 -->
+            </div>
+        </section>
+
+        <!-- 类型选择界面 (单词/句子) -->
+        <section id="typeSelection" class="py-8 hidden">
+            <div class="text-center mb-12">
+                <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-primary mb-4">选择学习类型</h2>
+                <p id="currentUnitText" class="text-gray-600 text-xl mb-4">当前单元: 单元1</p>
+                <p class="text-gray-600 text-lg max-w-2xl mx-auto">请选择要学习的内容类型</p>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row justify-center gap-8 max-w-md mx-auto">
+                <button id="wordTypeBtn" class="bg-primary hover:bg-primary/80 text-white py-6 px-10 rounded-2xl shadow-xl text-xl font-bold bounce-hover flex-1 flex flex-col items-center justify-center touch-target">
+                    <i class="fa fa-book text-4xl mb-3"></i>
+                    <span>单词学习</span>
+                </button>
+                
+                <button id="sentenceTypeBtn" class="bg-secondary hover:bg-secondary/80 text-white py-6 px-10 rounded-2xl shadow-xl text-xl font-bold bounce-hover flex-1 flex flex-col items-center justify-center touch-target">
+                    <i class="fa fa-comment text-4xl mb-3"></i>
+                    <span>句子学习</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- 学习界面 -->
+        <section id="learningInterface" class="py-8 hidden">
+            <div class="text-center mb-6">
+                <h2 class="text-[clamp(1.8rem,3vw,3rem)] font-bold text-primary mb-2">
+                    <span id="learningUnitName">单元1</span> - 
+                    <span id="learningTypeName">单词学习</span>
+                </h2>
+                <p class="text-gray-500 text-lg">
+                    <span id="currentItemIndex">1</span> / <span id="totalItemsCount">0</span>
+                </p>
+            </div>
+            
+            <!-- 内容卡片 -->
+            <div class="max-w-2xl mx-auto mb-10">
+                <div class="card-flip h-56 w-full">
+                    <div class="card-inner relative w-full h-full">
+                        <div class="card-front absolute w-full h-full bg-white rounded-3xl shadow-2xl flex items-center justify-center p-8 border-4 border-primary">
+                            <p id="currentContent" class="text-[clamp(1.8rem,5vw,3.5rem)] font-bold text-center transition-all duration-500"></p>
+                        </div>
+                        <div class="card-back absolute w-full h-full bg-white rounded-3xl shadow-2xl flex items-center justify-center p-8 border-4 border-accent">
+                            <p id="currentContentTranslation" class="text-[clamp(1.8rem,5vw,3.5rem)] font-bold text-center text-accent"></p>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-center mt-4 text-gray-500 cursor-pointer text-lg touch-target" id="flipCardBtn">
+                    <i class="fa fa-exchange mr-1"></i> 点击查看中文翻译
+                </p>
+            </div>
+            
+            <!-- 控制按钮 -->
+            <div class="flex flex-wrap justify-center gap-4 max-w-lg mx-auto mb-16">
+                <button id="playAudioBtn" class="bg-accent hover:bg-accent/80 text-white py-4 px-8 rounded-full shadow-lg transition-all duration-300 flex items-center space-x-2 pulse-animation touch-target touch-expand">
+                    <i class="fa fa-volume-up"></i>
+                    <span>播放发音</span>
+                </button>
+                
+                <button id="prevItemBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-700 py-4 px-8 rounded-full shadow-lg transition-all duration-300 flex items-center space-x-2 touch-target touch-expand">
+                    <i class="fa fa-arrow-left"></i>
+                    <span>上一个</span>
+                </button>
+                
+                <button id="nextItemBtn" class="bg-primary hover:bg-primary/80 text-white py-4 px-10 rounded-full shadow-lg transition-all duration-300 flex items-center space-x-2 touch-target touch-expand z-10">
+                    <span>下一个</span>
+                    <i class="fa fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- 管理员登录界面 -->
+        <section id="adminLogin" class="py-8 hidden">
+            <div class="max-w-md mx-auto bg-white rounded-3xl shadow-2xl p-8 border-4 border-primary">
+                <div class="text-center mb-6">
+                    <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-primary">管理员登录</h2>
+                    <p class="text-gray-500 text-lg">请输入管理员密码</p>
+                </div>
+                
+                <!-- 为表单添加submit事件处理 -->
+                <form id="adminLoginForm" class="space-y-4" onsubmit="handleFormSubmit(event)">
+                    <div>
+                        <label for="adminPassword" class="block text-gray-700 mb-2 text-lg">密码</label>
+                        <input type="password" id="adminPassword" 
+                               class="w-full px-4 py-3 rounded-xl border-2 border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/30 outline-none transition-all text-lg"
+                               placeholder="请输入管理员密码">
+                    </div>
+                    
+                    <div id="loginError" class="text-red-500 text-center hidden text-lg">
+                        密码错误，请重试！
+                    </div>
+                    
+                    <button type="submit" id="submitLoginBtn" class="w-full bg-primary hover:bg-primary/80 text-white py-3 px-4 rounded-xl font-bold transition-all duration-300 text-lg touch-target">
+                        登录
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- 管理员界面 -->
+        <section id="adminInterface" class="py-8 hidden">
+            <!-- 顶部操作区：数据源管理按钮 -->
+            <div class="flex justify-end items-center mb-6 max-w-2xl mx-auto">
+                <!-- 数据源管理按钮 -->
+                <button id="dataSourceBtn" class="bg-primary hover:bg-primary/80 text-white py-2 px-6 rounded-lg shadow transition-all duration-300 flex items-center touch-target">
+                    <i class="fa fa-database mr-2"></i>
+                    <span>数据源管理</span>
+                </button>
+            </div>
+            
+            <div class="text-center mb-8">
+                <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-primary mb-4">管理员设置</h2>
+                <p class="text-gray-600 text-lg">设置每个单元的单词和句子内容</p>
+            </div>
+            
+            <!-- 单元选择和显示模式 - 与下方单词设置区域宽度一致 -->
+            <div class="mb-6 space-y-4 max-w-2xl mx-auto">
+                <!-- 单元选择部分 -->
+                <div class="flex items-center gap-3">
+                    <div class="flex-1 flex flex-row gap-2 min-w-0 whitespace-nowrap">
+                        <select id="adminUnitSelect" class="flex-1 min-w-0 px-3 py-2 rounded-xl border-2 border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/30 outline-none transition-all text-base"
+                                title="选择单元">
+                            <!-- 选项将通过JS动态生成 -->
+                        </select>
+                        
+                        <div class="flex-shrink-0 flex gap-2 w-[80px]">
+                            <button id="renameUnitBtn" class="flex-1 bg-secondary hover:bg-secondary/80 text-white py-2 px-2 rounded-xl transition-all duration-300 touch-target"
+                                    title="重命名单元">
+                                <i class="fa fa-pencil"></i>
+                            </button>
+                            <button id="deleteUnitBtn" class="flex-1 bg-danger hover:bg-danger/80 text-white py-2 px-2 rounded-xl transition-all duration-300 touch-target"
+                                    title="删除单元">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 显示模式设置 -->
+                <div class="flex items-center gap-3">
+                    <div class="flex-1">
+                        <select id="displayModeSelect" class="w-full px-4 py-2 rounded-xl border-2 border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/30 outline-none transition-all text-lg"
+                                title="显示模式">
+                            <option value="sequential">顺序模式 - 按顺序显示内容</option>
+                            <option value="random">随机模式 - 随机显示内容</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 添加新单元按钮 -->
+            <div class="text-center mb-8">
+                <button id="addNewUnitBtn" class="bg-secondary hover:bg-secondary/80 text-white py-2 px-6 rounded-full shadow-md transition-all duration-300 flex items-center mx-auto text-lg touch-target">
+                    <i class="fa fa-plus mr-2"></i>
+                    <span>添加新单元</span>
+                </button>
+            </div>
+            
+            <!-- 单词设置 -->
+            <div class="max-w-2xl mx-auto mb-8 bg-white rounded-2xl shadow-xl p-6 border-l-4 border-primary">
+                <h3 class="text-xl font-bold text-primary mb-4 flex items-center">
+                    <i class="fa fa-book mr-2"></i> 单词设置
+                </h3>
+                <p class="text-gray-500 mb-4 text-lg">每行输入一个单词，格式：英文,中文翻译</p>
+                <textarea id="wordsTextarea" class="w-full h-40 px-4 py-3 rounded-xl border-2 border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/30 outline-none transition-all font-sans text-lg"
+                          placeholder="例如：
+apple,苹果
+book,书"></textarea>
+            </div>
+            
+            <!-- 句子设置 -->
+            <div class="max-w-2xl mx-auto mb-10 bg-white rounded-2xl shadow-xl p-6 border-l-4 border-secondary">
+                <h3 class="text-xl font-bold text-secondary mb-4 flex items-center">
+                    <i class="fa fa-comment mr-2"></i> 句子设置
+                </h3>
+                <p class="text-gray-500 mb-4 text-lg">每行输入一个句子，格式：英文,中文翻译</p>
+                <textarea id="sentencesTextarea" class="w-full h-40 px-4 py-3 rounded-xl border-2 border-gray-300 focus:border-secondary focus:ring-2 focus:ring-secondary/30 outline-none transition-all font-sans text-lg"
+                          placeholder="例如：
+I like apples.,我喜欢苹果。
+This is a book.,这是一本书。"></textarea>
+            </div>
+            
+            <!-- 管理员操作按钮 -->
+            <div class="flex flex-wrap justify-center gap-4 max-w-lg mx-auto">
+                <button id="saveSettingsBtn" class="bg-accent hover:bg-accent/80 text-white py-3 px-8 rounded-full shadow-lg transition-all duration-300 flex items-center space-x-2 text-lg touch-target">
+                    <i class="fa fa-save"></i>
+                    <span>保存设置</span>
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-primary/90 text-white shadow-lg backdrop-blur-sm py-4 mt-8">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-sm">© 2023 小学生英语学习乐园 | 让学习更有趣</p>
+            <p class="text-xs mt-1 opacity-80">适合儿童的英语学习工具</p>
+        </div>
+    </footer>
+
+    <!-- 单元重命名模态框 -->
+    <div id="renameUnitModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-4 border-b pb-4">
+                <h3 class="text-xl font-bold text-primary flex items-center">
+                    <i class="fa fa-pencil mr-2"></i> 重命名单元
+                </h3>
+                <button id="closeRenameModal" class="text-gray-500 hover:text-gray-700 transition-colors touch-target">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="mb-4">
+                <p class="text-gray-600 mb-3 text-lg">请输入单元的新名称</p>
+                
+                <input type="text" id="newUnitName" placeholder="输入新的单元名称" 
+                       class="w-full px-4 py-3 rounded-xl border-2 border-gray-300 focus:border-secondary focus:ring-2 focus:ring-secondary/30 outline-none transition-all text-lg">
+            </div>
+            
+            <div class="flex justify-end gap-3 pt-4 border-t">
+                <button id="cancelRenameBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-6 rounded-xl transition-all duration-300 touch-target">
+                    取消
+                </button>
+                <button id="confirmRenameBtn" class="bg-secondary hover:bg-secondary/80 text-white py-2 px-6 rounded-xl transition-all duration-300 touch-target">
+                    确认
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 数据源管理模态框 -->
+    <div id="dataSourceModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden flex flex-col">
+            <div class="flex justify-between items-center mb-4 border-b pb-4">
+                <h3 class="text-xl font-bold text-primary flex items-center">
+                    <i class="fa fa-database mr-2"></i> 数据源管理
+                </h3>
+                <button id="closeDataSourceModal" class="text-gray-500 hover:text-gray-700 transition-colors touch-target">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="mb-4 flex-1 overflow-auto">
+                <p class="text-gray-600 mb-3 text-lg">请编辑JSON格式的数据源，完成后点击保存按钮。</p>
+                <p class="text-gray-500 mb-4 text-sm">提示：请确保JSON格式正确，否则可能导致数据损坏。建议操作前备份数据。</p>
+                
+                <div class="border rounded-lg overflow-hidden">
+                    <textarea id="dataSourceTextarea" class="w-full h-[50vh] p-4 font-mono text-sm focus:outline-none"
+                              placeholder="JSON数据将显示在这里..."></textarea>
+                </div>
+                
+                <div id="jsonError" class="text-red-500 mt-3 text-sm hidden">
+                    <i class="fa fa-exclamation-circle mr-1"></i>
+                    <span id="jsonErrorMessage">JSON格式错误，请检查</span>
+                </div>
+            </div>
+            
+            <div class="flex justify-end gap-3 pt-4 border-t">
+                <button id="cancelDataSourceBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-6 rounded-xl transition-all duration-300 touch-target">
+                    取消
+                </button>
+                <button id="saveDataSourceBtn" class="bg-accent hover:bg-accent/80 text-white py-2 px-6 rounded-xl transition-all duration-300 touch-target">
+                    <i class="fa fa-save mr-1"></i> 保存数据源
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 确认对话框 -->
+    <div id="confirmDialog" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 border-4 border-danger">
+            <div class="text-center mb-6">
+                <i class="fa fa-exclamation-triangle text-4xl text-danger mb-4"></i>
+                <h3 class="text-xl font-bold text-danger">确认删除</h3>
+                <p class="text-gray-600 mt-2 text-lg">你确定要删除这个单元吗？此操作不可恢复。</p>
+            </div>
+            
+            <div class="flex gap-4 justify-center">
+                <button id="confirmDeleteBtn" class="bg-danger hover:bg-danger/80 text-white py-2 px-6 rounded-xl font-bold transition-all duration-300 text-lg touch-target">
+                    确认删除
+                </button>
+                <button id="cancelDeleteBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-6 rounded-xl font-bold transition-all duration-300 text-lg touch-target">
+                    取消
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 通知提示 -->
+    <div id="notification" class="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-dark text-white px-6 py-3 rounded-full shadow-2xl opacity-0 transition-opacity duration-300 flex items-center space-x-2 z-50">
+        <i id="notificationIcon" class="fa fa-check-circle"></i>
+        <span id="notificationText" class="text-lg">操作成功</span>
+    </div>
+
+    <script>
+        // 全局变量
+        let currentUnit = null;
+        let currentType = null;
+        let currentIndex = 0;
+        let learningItems = [];
+        let translationItems = [];
+        let unitToDelete = null;
+        let unitToRename = null; // 记录要重命名的单元
+        let displayMode = "sequential"; // 显示模式，默认顺序模式
+        let tempNewUnit = null; // 临时存储新创建的单元，用于取消操作
+        // 导航历史记录，用于管理返回逻辑
+        let navigationHistory = ['unitSelection'];
+        
+        // 初始化数据结构
+        const defaultData = {
+            units: [
+                {
+                    id: 1,
+                    name: "单元1",
+                    displayMode: "sequential",
+                    words: [
+                        { english: "apple", chinese: "苹果" },
+                        { english: "banana", chinese: "香蕉" },
+                        { english: "cat", chinese: "猫" },
+                        { english: "dog", chinese: "狗" },
+                        { english: "egg", chinese: "鸡蛋" }
+                    ],
+                    sentences: [
+                        { english: "I like apples.", chinese: "我喜欢苹果。" },
+                        { english: "This is a cat.", chinese: "这是一只猫。" },
+                        { english: "I have a dog.", chinese: "我有一只狗。" }
+                    ]
+                },
+                {
+                    id: 2,
+                    name: "单元2",
+                    displayMode: "sequential",
+                    words: [
+                        { english: "red", chinese: "红色" },
+                        { english: "blue", chinese: "蓝色" },
+                        { english: "green", chinese: "绿色" },
+                        { english: "yellow", chinese: "黄色" }
+                    ],
+                    sentences: [
+                        { english: "The sky is blue.", chinese: "天空是蓝色的。" },
+                        { english: "Grass is green.", chinese: "草是绿色的。" }
+                    ]
+                }
+            ]
+        };
+
+        // 初始化本地存储
+        function initLocalStorage() {
+            // 检查是否存在旧数据，如果存在则更新为包含displayMode的新结构
+            const oldData = localStorage.getItem('englishLearningData');
+            if (oldData) {
+                const parsedData = JSON.parse(oldData);
+                // 如果数据中没有displayMode属性，则添加默认值
+                if (!parsedData.units[0].hasOwnProperty('displayMode')) {
+                    parsedData.units.forEach(unit => {
+                        unit.displayMode = "sequential";
+                    });
+                    localStorage.setItem('englishLearningData', JSON.stringify(parsedData));
+                }
+            } else {
+                localStorage.setItem('englishLearningData', JSON.stringify(defaultData));
+            }
+        }
+
+        // 获取数据
+        function getData() {
+            return JSON.parse(localStorage.getItem('englishLearningData')) || defaultData;
+        }
+
+        // 保存数据
+        function saveData(data) {
+            localStorage.setItem('englishLearningData', JSON.stringify(data));
+            showNotification('数据已保存', 'success');
+        }
+
+        // 渲染单元选择界面
+        function renderUnitSelection() {
+            const data = getData();
+            const unitContainer = document.querySelector('#unitSelection .grid');
+            unitContainer.innerHTML = '';
+            
+            data.units.forEach(unit => {
+                const unitCard = document.createElement('div');
+                unitCard.className = 'bg-white rounded-2xl shadow-xl p-6 text-center cursor-pointer hover:shadow-2xl transition-all duration-300 border-4 border-primary/30 hover:border-primary bounce-hover touch-target';
+                unitCard.innerHTML = `
+                    <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <span class="text-primary text-2xl font-bold">${unit.id}</span>
+                    </div>
+                    <h3 class="font-bold text-lg">${unit.name}</h3>
+                    <p class="text-sm text-gray-500 mt-1">
+                        ${unit.words.length}个单词 | ${unit.sentences.length}个句子
+                    </p>
+                    <p class="text-xs text-gray-400 mt-2">
+                        ${unit.displayMode === 'sequential' ? '顺序模式' : '随机模式'}
+                    </p>
+                `;
+                
+                unitCard.addEventListener('click', () => {
+                    currentUnit = unit;
+                    document.getElementById('currentUnitText').textContent = `当前单元: ${unit.name}`;
+                    navigateTo('typeSelection');
+                });
+                
+                unitContainer.appendChild(unitCard);
+            });
+        }
+
+        // 渲染管理员单元选择，添加参数以保持当前选中单元
+        function renderAdminUnitSelect(keepSelectedId = null) {
+            const data = getData();
+            const selectElement = document.getElementById('adminUnitSelect');
+            const currentValue = keepSelectedId !== null ? keepSelectedId : selectElement.value;
+            selectElement.innerHTML = '';
+            
+            data.units.forEach(unit => {
+                const option = document.createElement('option');
+                option.value = unit.id;
+                option.textContent = unit.name;
+                selectElement.appendChild(option);
+            });
+            
+            // 如果有指定要保持的选中ID，则选中它
+            if (keepSelectedId !== null && data.units.some(u => u.id == keepSelectedId)) {
+                selectElement.value = keepSelectedId;
+            }
+            // 否则，如果有选项但没有选中值，选中第一个
+            else if (data.units.length > 0 && (!currentValue || !data.units.some(u => u.id == currentValue))) {
+                selectElement.value = data.units[0].id;
+            }
+            
+            // 加载选中单元的数据，包括显示模式
+            loadUnitDataForAdmin();
+        }
+
+        // 为管理员加载选中单元的数据，包括显示模式
+        function loadUnitDataForAdmin() {
+            const data = getData();
+            const unitId = parseInt(document.getElementById('adminUnitSelect').value);
+            const unit = data.units.find(u => u.id === unitId);
+            
+            if (unit) {
+                // 填充单词文本框
+                const wordsText = unit.words.map(item => `${item.english},${item.chinese}`).join('\n');
+                document.getElementById('wordsTextarea').value = wordsText;
+                
+                // 填充句子文本框
+                const sentencesText = unit.sentences.map(item => `${item.english},${item.chinese}`).join('\n');
+                document.getElementById('sentencesTextarea').value = sentencesText;
+                
+                // 选择显示模式
+                document.getElementById('displayModeSelect').value = unit.displayMode || "sequential";
+            }
+        }
+
+        // 保存管理员设置，包括显示模式
+        function saveAdminSettings() {
+            const data = getData();
+            const unitId = parseInt(document.getElementById('adminUnitSelect').value);
+            const unitIndex = data.units.findIndex(u => u.id === unitId);
+            
+            if (unitIndex !== -1) {
+                // 处理单词
+                const wordsText = document.getElementById('wordsTextarea').value;
+                const words = wordsText.split('\n')
+                    .filter(line => line.trim() !== '')
+                    .map(line => {
+                        const [english, chinese] = line.split(',').map(part => part.trim());
+                        return { english: english || '', chinese: chinese || '' };
+                    });
+                
+                // 处理句子
+                const sentencesText = document.getElementById('sentencesTextarea').value;
+                const sentences = sentencesText.split('\n')
+                    .filter(line => line.trim() !== '')
+                    .map(line => {
+                        const [english, chinese] = line.split(',').map(part => part.trim());
+                        return { english: english || '', chinese: chinese || '' };
+                    });
+                
+                // 处理显示模式
+                const selectedMode = document.getElementById('displayModeSelect').value;
+                
+                // 更新单元数据
+                data.units[unitIndex].words = words;
+                data.units[unitIndex].sentences = sentences;
+                data.units[unitIndex].displayMode = selectedMode; // 保存显示模式
+                
+                // 保存数据
+                saveData(data);
+                
+                // 更新单元选择界面
+                renderUnitSelection();
+            }
+        }
+
+        // 添加新单元，现在只创建临时单元，不立即保存
+        function addNewUnit() {
+            const data = getData();
+            const newUnitId = data.units.length > 0 
+                ? Math.max(...data.units.map(u => u.id)) + 1 
+                : 1;
+            
+            // 创建临时新单元，不保存到数据中
+            tempNewUnit = {
+                id: newUnitId,
+                name: `新单元${newUnitId}`,
+                displayMode: "sequential",
+                words: [],
+                sentences: []
+            };
+            
+            // 临时添加到数据中并更新界面，但不保存到本地存储
+            data.units.push(tempNewUnit);
+            renderAdminUnitSelect(newUnitId);
+            
+            // 显示重命名弹框，等待用户确认
+            document.getElementById('renameUnitBtn').click();
+        }
+
+        // 显示重命名弹框
+        function showRenameModal() {
+            const data = getData();
+            const unitId = parseInt(document.getElementById('adminUnitSelect').value);
+            unitToRename = data.units.find(u => u.id === unitId);
+            
+            if (unitToRename) {
+                document.getElementById('newUnitName').value = unitToRename.name;
+                document.getElementById('renameUnitModal').classList.remove('hidden');
+                document.getElementById('newUnitName').focus();
+            }
+        }
+
+        // 隐藏重命名弹框 - 如果是新建单元且用户取消，则删除临时单元
+        function hideRenameModal() {
+            // 检查是否是新建单元且用户点击了取消
+            if (tempNewUnit && unitToRename && unitToRename.id === tempNewUnit.id) {
+                const data = getData();
+                // 从数据中移除临时单元
+                data.units = data.units.filter(u => u.id !== tempNewUnit.id);
+                // 不保存数据，直接更新界面
+                renderAdminUnitSelect();
+                renderUnitSelection();
+                // 重置临时变量
+                tempNewUnit = null;
+            }
+            
+            document.getElementById('renameUnitModal').classList.add('hidden');
+            unitToRename = null;
+        }
+
+        // 执行单元重命名，保持当前单元选择
+        function renameUnit() {
+            const newName = document.getElementById('newUnitName').value.trim();
+            if (!newName) {
+                showNotification('单元名称不能为空', 'error');
+                return;
+            }
+            
+            if (unitToRename) {
+                const data = getData();
+                const unitIndex = data.units.findIndex(u => u.id === unitToRename.id);
+                const currentUnitId = unitToRename.id; // 保存当前单元ID
+                
+                if (unitIndex !== -1) {
+                    data.units[unitIndex].name = newName;
+                    
+                    // 如果是新建单元，则此时才真正保存
+                    saveData(data);
+                    
+                    // 更新界面，保持选中当前单元
+                    renderAdminUnitSelect(currentUnitId);
+                    renderUnitSelection();
+                    hideRenameModal();
+                    
+                    // 重置临时变量
+                    tempNewUnit = null;
+                    
+                    showNotification('单元已创建并命名');
+                }
+            }
+        }
+
+        // 显示删除确认对话框
+        function showDeleteConfirmation() {
+            const data = getData();
+            const unitId = parseInt(document.getElementById('adminUnitSelect').value);
+            unitToDelete = data.units.find(u => u.id === unitId);
+            
+            if (data.units.length <= 1) {
+                showNotification('至少保留一个单元', 'error');
+                return;
+            }
+            
+            if (unitToDelete) {
+                document.getElementById('confirmDialog').classList.remove('hidden');
+            }
+        }
+
+        // 隐藏删除确认对话框
+        function hideDeleteConfirmation() {
+            document.getElementById('confirmDialog').classList.add('hidden');
+            unitToDelete = null;
+        }
+
+        // 执行单元删除
+        function deleteUnit() {
+            if (unitToDelete) {
+                const data = getData();
+                data.units = data.units.filter(u => u.id !== unitToDelete.id);
+                saveData(data);
+                
+                // 更新界面
+                renderAdminUnitSelect();
+                renderUnitSelection();
+                hideDeleteConfirmation();
+                showNotification('单元已删除');
+            }
+        }
+
+        // 获取下一个随机索引，确保不与当前索引相同
+        function getNextRandomIndex(current) {
+            // 如果只有一个项目，返回当前索引
+            if (learningItems.length <= 1) {
+                return 0;
+            }
+            
+            let randomIndex;
+            // 生成一个与当前索引不同的随机索引
+            do {
+                randomIndex = Math.floor(Math.random() * learningItems.length);
+            } while (randomIndex === current);
+            
+            return randomIndex;
+        }
+
+        // 开始学习，根据显示模式初始化
+        function startLearning(type) {
+            currentType = type;
+            currentIndex = 0;
+            
+            // 获取学习内容
+            if (type === 'words') {
+                learningItems = currentUnit.words.map(item => item.english);
+                translationItems = currentUnit.words.map(item => item.chinese);
+                document.getElementById('learningTypeName').textContent = '单词学习';
+            } else {
+                learningItems = currentUnit.sentences.map(item => item.english);
+                translationItems = currentUnit.sentences.map(item => item.chinese);
+                document.getElementById('learningTypeName').textContent = '句子学习';
+            }
+            
+            // 保存当前单元的显示模式
+            displayMode = currentUnit.displayMode || "sequential";
+            
+            // 如果是随机模式且有多个项目，第一个随机显示
+            if (displayMode === "random" && learningItems.length > 1) {
+                currentIndex = Math.floor(Math.random() * learningItems.length);
+            }
+            
+            // 更新界面
+            document.getElementById('learningUnitName').textContent = currentUnit.name;
+            document.getElementById('totalItemsCount').textContent = learningItems.length;
+            updateLearningContent();
+            
+            // 显示学习界面
+            navigateTo('learningInterface');
+        }
+
+        // 更新学习内容
+        function updateLearningContent() {
+            if (learningItems.length === 0) {
+                document.getElementById('currentContent').textContent = '没有内容';
+                document.getElementById('currentContentTranslation').textContent = '请联系老师添加内容';
+                document.getElementById('prevItemBtn').disabled = true;
+                document.getElementById('nextItemBtn').disabled = true;
+                document.getElementById('playAudioBtn').disabled = true;
+                return;
+            }
+            
+            // 更新当前内容
+            document.getElementById('currentContent').textContent = learningItems[currentIndex];
+            document.getElementById('currentContentTranslation').textContent = translationItems[currentIndex];
+            document.getElementById('currentItemIndex').textContent = currentIndex + 1;
+            
+            // 按钮始终可用，支持循环浏览
+            document.getElementById('prevItemBtn').disabled = false;
+            document.getElementById('nextItemBtn').disabled = false;
+            document.getElementById('playAudioBtn').disabled = false;
+            
+            // 重置卡片翻转状态
+            document.querySelector('.card-flip').classList.remove('card-flipped');
+            document.getElementById('flipCardBtn').innerHTML = '<i class="fa fa-exchange mr-1"></i> 点击查看中文翻译';
+        }
+
+        // 播放语音
+        function playAudio() {
+            const text = learningItems[currentIndex];
+            if ('speechSynthesis' in window) {
+                // 停止任何正在播放的语音
+                window.speechSynthesis.cancel();
+                
+                // 创建新的语音实例
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.9; // 稍微放慢语速，适合学习
+                utterance.pitch = 1.2; // 稍微提高音调，更友好
+                
+                // 播放语音
+                window.speechSynthesis.speak(utterance);
+                
+                // 显示播放动画
+                const playBtn = document.getElementById('playAudioBtn');
+                playBtn.classList.add('animate-pulse');
+                utterance.onend = () => {
+                    playBtn.classList.remove('animate-pulse');
+                };
+            } else {
+                showNotification('您的浏览器不支持语音合成', 'error');
+            }
+        }
+
+        // 显示通知
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const icon = document.getElementById('notificationIcon');
+            const text = document.getElementById('notificationText');
+            
+            // 设置图标
+            if (type === 'success') {
+                icon.className = 'fa fa-check-circle';
+                notification.classList.add('bg-accent');
+                notification.classList.remove('bg-red-500');
+            } else {
+                icon.className = 'fa fa-exclamation-circle';
+                notification.classList.add('bg-red-500');
+                notification.classList.remove('bg-accent');
+            }
+            
+            // 设置文本
+            text.textContent = message;
+            
+            // 显示通知
+            notification.style.opacity = '1';
+            
+            // 3秒后隐藏
+            setTimeout(() => {
+                notification.style.opacity = '0';
+            }, 3000);
+        }
+
+        // 导航到指定界面
+        function navigateTo(sectionId) {
+            // 隐藏所有界面
+            const sections = ['unitSelection', 'typeSelection', 'learningInterface', 'adminLogin', 'adminInterface'];
+            sections.forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            
+            // 对于管理员界面和登录界面，不添加到常规导航历史
+            if (sectionId !== 'adminInterface' && sectionId !== 'adminLogin') {
+                // 移除当前界面之后的历史记录（如果有）
+                const currentIndex = navigationHistory.indexOf(getCurrentSection());
+                if (currentIndex !== -1) {
+                    navigationHistory = navigationHistory.slice(0, currentIndex + 1);
+                }
+                // 添加新界面到历史记录
+                navigationHistory.push(sectionId);
+            }
+            
+            // 显示目标界面
+            document.getElementById(sectionId).classList.remove('hidden');
+            
+            // 更新返回按钮
+            updateBackButton(sectionId);
+            
+            // 控制管理员按钮的显示状态
+            const adminBtn = document.getElementById('adminBtn');
+            if (sectionId === 'adminInterface' || sectionId === 'adminLogin') {
+                adminBtn.classList.add('hidden');
+            } else {
+                adminBtn.classList.remove('hidden');
+            }
+            
+            // 滚动到顶部，确保在移动设备上按钮可见
+            window.scrollTo(0, 0);
+        }
+
+        // 获取当前显示的界面
+        function getCurrentSection() {
+            const sections = ['unitSelection', 'typeSelection', 'learningInterface', 'adminLogin', 'adminInterface'];
+            for (const id of sections) {
+                if (!document.getElementById(id).classList.contains('hidden')) {
+                    return id;
+                }
+            }
+            return 'unitSelection'; // 默认返回单元选择界面
+        }
+
+        // 更新返回按钮的显示和功能
+        function updateBackButton(currentSection) {
+            const backBtn = document.getElementById('backBtn');
+            const backBtnText = document.getElementById('backBtnText');
+            
+            // 首页不需要返回按钮
+            if (currentSection === 'unitSelection') {
+                backBtn.classList.add('hidden');
+                return;
+            }
+            
+            // 显示返回按钮
+            backBtn.classList.remove('hidden');
+            
+            // 根据当前section设置返回按钮文本
+            switch(currentSection) {
+                case 'typeSelection':
+                    backBtnText.textContent = '返回单元';
+                    break;
+                case 'learningInterface':
+                    backBtnText.textContent = '返回类型';
+                    break;
+                case 'adminLogin':
+                    backBtnText.textContent = '返回学习';
+                    break;
+                case 'adminInterface':
+                    backBtnText.textContent = '退出管理';
+                    break;
+                default:
+                    backBtnText.textContent = '返回';
+            }
+        }
+
+        // 处理返回按钮点击
+        function handleBackButton() {
+            const currentSection = getCurrentSection();
+            
+            // 从管理员界面返回时，直接回到单元选择界面
+            if (currentSection === 'adminInterface') {
+                navigateTo('unitSelection');
+                return;
+            }
+            
+            // 从登录界面返回时，回到单元选择界面
+            if (currentSection === 'adminLogin') {
+                navigateTo('unitSelection');
+                return;
+            }
+            
+            // 从类型选择界面返回时，回到单元选择界面
+            if (currentSection === 'typeSelection') {
+                navigateTo('unitSelection');
+                return;
+            }
+            
+            // 从学习界面返回时，回到类型选择界面
+            if (currentSection === 'learningInterface') {
+                navigateTo('typeSelection');
+                return;
+            }
+            
+            // 默认返回单元选择界面
+            navigateTo('unitSelection');
+        }
+
+        // 处理表单提交事件，防止默认行为
+        function handleFormSubmit(event) {
+            event.preventDefault(); // 阻止表单默认提交行为
+            handleAdminLogin();
+        }
+
+        // 管理员登录处理函数
+        function handleAdminLogin() {
+            const password = document.getElementById('adminPassword').value;
+            if (password === '123456') {
+                // 密码正确，进入管理员界面
+                renderAdminUnitSelect();
+                navigateTo('adminInterface');
+                // 清除错误信息
+                document.getElementById('loginError').classList.add('hidden');
+            } else {
+                // 密码错误，显示错误信息
+                document.getElementById('loginError').classList.remove('hidden');
+                // 不执行任何导航操作
+                return false;
+            }
+        }
+
+        // 数据源管理相关函数
+        function openDataSourceModal() {
+            // 获取当前数据并以格式化的JSON显示
+            const data = getData();
+            document.getElementById('dataSourceTextarea').value = JSON.stringify(data, null, 2);
+            
+            // 隐藏错误提示
+            document.getElementById('jsonError').classList.add('hidden');
+            
+            // 显示模态框
+            document.getElementById('dataSourceModal').classList.remove('hidden');
+        }
+
+        // 关闭数据源管理模态框 - 单独的函数便于绑定事件
+        function closeDataSourceModal() {
+            document.getElementById('dataSourceModal').classList.add('hidden');
+        }
+
+        function saveDataSource() {
+            try {
+                // 隐藏错误提示
+                document.getElementById('jsonError').classList.add('hidden');
+                
+                // 获取文本框内容并解析JSON
+                const jsonText = document.getElementById('dataSourceTextarea').value;
+                const parsedData = JSON.parse(jsonText);
+                
+                // 基本数据结构验证
+                if (!parsedData || !parsedData.units || !Array.isArray(parsedData.units)) {
+                    throw new Error("数据结构不正确，必须包含units数组");
+                }
+                
+                // 保存数据
+                saveData(parsedData);
+                
+                // 关闭模态框
+                closeDataSourceModal();
+                
+                // 更新界面
+                renderUnitSelection();
+                renderAdminUnitSelect();
+                
+                showNotification('数据源已更新');
+            } catch (error) {
+                // 显示错误信息
+                document.getElementById('jsonErrorMessage').textContent = error.message;
+                document.getElementById('jsonError').classList.remove('hidden');
+            }
+        }
+
+        // 初始化事件监听
+        function initEventListeners() {
+            // 返回按钮
+            const backBtn = document.getElementById('backBtn');
+            backBtn.addEventListener('click', handleBackButton);
+            backBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                handleBackButton();
+            });
+            
+            // 管理员按钮
+            const adminBtn = document.getElementById('adminBtn');
+            adminBtn.addEventListener('click', () => {
+                navigateTo('adminLogin');
+                document.getElementById('adminPassword').value = '';
+                document.getElementById('loginError').classList.add('hidden');
+            });
+            adminBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                navigateTo('adminLogin');
+                document.getElementById('adminPassword').value = '';
+                document.getElementById('loginError').classList.add('hidden');
+            });
+            
+            // 管理员登录 - 按钮事件
+            const submitLoginBtn = document.getElementById('submitLoginBtn');
+            submitLoginBtn.addEventListener('click', (e) => {
+                e.preventDefault(); // 防止按钮默认提交行为
+                handleAdminLogin();
+            });
+            submitLoginBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                handleAdminLogin();
+            });
+            
+            // 管理员密码框回车事件
+            document.getElementById('adminPassword').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault(); // 阻止默认行为
+                    handleAdminLogin();
+                }
+            });
+            
+            // 保存管理员设置
+            const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+            saveSettingsBtn.addEventListener('click', saveAdminSettings);
+            saveSettingsBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                saveAdminSettings();
+            });
+            
+            // 添加新单元
+            const addNewUnitBtn = document.getElementById('addNewUnitBtn');
+            addNewUnitBtn.addEventListener('click', addNewUnit);
+            addNewUnitBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                addNewUnit();
+            });
+            
+            // 单元选择变化时加载数据
+            document.getElementById('adminUnitSelect').addEventListener('change', loadUnitDataForAdmin);
+            
+            // 单元重命名相关
+            const renameUnitBtn = document.getElementById('renameUnitBtn');
+            renameUnitBtn.addEventListener('click', showRenameModal);
+            renameUnitBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                showRenameModal();
+            });
+            
+            const confirmRenameBtn = document.getElementById('confirmRenameBtn');
+            confirmRenameBtn.addEventListener('click', renameUnit);
+            confirmRenameBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                renameUnit();
+            });
+            
+            const cancelRenameBtn = document.getElementById('cancelRenameBtn');
+            cancelRenameBtn.addEventListener('click', hideRenameModal);
+            cancelRenameBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                hideRenameModal();
+            });
+            
+            const closeRenameModal = document.getElementById('closeRenameModal');
+            closeRenameModal.addEventListener('click', hideRenameModal);
+            closeRenameModal.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                hideRenameModal();
+            });
+            
+            document.getElementById('newUnitName').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    renameUnit();
+                }
+            });
+            
+            // 点击模态框外部关闭
+            document.getElementById('renameUnitModal').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('renameUnitModal')) {
+                    hideRenameModal();
+                }
+            });
+            
+            // 单元删除相关
+            const deleteUnitBtn = document.getElementById('deleteUnitBtn');
+            deleteUnitBtn.addEventListener('click', showDeleteConfirmation);
+            deleteUnitBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                showDeleteConfirmation();
+            });
+            
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            confirmDeleteBtn.addEventListener('click', deleteUnit);
+            confirmDeleteBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                deleteUnit();
+            });
+            
+            const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+            cancelDeleteBtn.addEventListener('click', hideDeleteConfirmation);
+            cancelDeleteBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                hideDeleteConfirmation();
+            });
+            
+            // 类型选择
+            const wordTypeBtn = document.getElementById('wordTypeBtn');
+            wordTypeBtn.addEventListener('click', () => {
+                startLearning('words');
+            });
+            wordTypeBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                startLearning('words');
+            });
+            
+            const sentenceTypeBtn = document.getElementById('sentenceTypeBtn');
+            sentenceTypeBtn.addEventListener('click', () => {
+                startLearning('sentences');
+            });
+            sentenceTypeBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                startLearning('sentences');
+            });
+            
+            // 学习界面控制
+            const prevItemBtn = document.getElementById('prevItemBtn');
+            prevItemBtn.addEventListener('click', () => {
+                if (learningItems.length <= 1) return;
+                
+                if (displayMode === "sequential") {
+                    currentIndex = currentIndex === 0 ? learningItems.length - 1 : currentIndex - 1;
+                } else {
+                    currentIndex = getNextRandomIndex(currentIndex);
+                }
+                
+                updateLearningContent();
+            });
+            prevItemBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                if (learningItems.length <= 1) return;
+                
+                if (displayMode === "sequential") {
+                    currentIndex = currentIndex === 0 ? learningItems.length - 1 : currentIndex - 1;
+                } else {
+                    currentIndex = getNextRandomIndex(currentIndex);
+                }
+                
+                updateLearningContent();
+            });
+            
+            // 下一个按钮
+            const nextItemBtn = document.getElementById('nextItemBtn');
+            nextItemBtn.addEventListener('click', handleNextItem);
+            nextItemBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                handleNextItem();
+            });
+            
+            // 播放语音
+            const playAudioBtn = document.getElementById('playAudioBtn');
+            playAudioBtn.addEventListener('click', playAudio);
+            playAudioBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                playAudio();
+            });
+            
+            // 卡片翻转
+            const flipCardBtn = document.getElementById('flipCardBtn');
+            flipCardBtn.addEventListener('click', () => {
+                const card = document.querySelector('.card-flip');
+                card.classList.toggle('card-flipped');
+                
+                const btnText = card.classList.contains('card-flipped') 
+                    ? '<i class="fa fa-exchange mr-1"></i> 点击查看英文' 
+                    : '<i class="fa fa-exchange mr-1"></i> 点击查看中文翻译';
+                
+                document.getElementById('flipCardBtn').innerHTML = btnText;
+            });
+            flipCardBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                const card = document.querySelector('.card-flip');
+                card.classList.toggle('card-flipped');
+                
+                const btnText = card.classList.contains('card-flipped') 
+                    ? '<i class="fa fa-exchange mr-1"></i> 点击查看英文' 
+                    : '<i class="fa fa-exchange mr-1"></i> 点击查看中文翻译';
+                
+                document.getElementById('flipCardBtn').innerHTML = btnText;
+            });
+            
+            // 数据源管理相关事件
+            const dataSourceBtn = document.getElementById('dataSourceBtn');
+            dataSourceBtn.addEventListener('click', openDataSourceModal);
+            dataSourceBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                openDataSourceModal();
+            });
+            
+            // 关闭数据源模态框按钮
+            const closeDSModal = document.getElementById('closeDataSourceModal');
+            closeDSModal.addEventListener('click', closeDataSourceModal);
+            closeDSModal.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                closeDataSourceModal();
+            });
+            
+            // 取消数据源按钮
+            const cancelDataSourceBtn = document.getElementById('cancelDataSourceBtn');
+            cancelDataSourceBtn.addEventListener('click', closeDataSourceModal);
+            cancelDataSourceBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                closeDataSourceModal();
+            });
+            
+            const saveDataSourceBtn = document.getElementById('saveDataSourceBtn');
+            saveDataSourceBtn.addEventListener('click', saveDataSource);
+            saveDataSourceBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                saveDataSource();
+            });
+            
+            // 点击模态框外部关闭
+            document.getElementById('dataSourceModal').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('dataSourceModal')) {
+                    closeDataSourceModal();
+                }
+            });
+        }
+        
+        // 下一个按钮处理函数
+        function handleNextItem() {
+            if (learningItems.length <= 1) return;
+            
+            if (displayMode === "sequential") {
+                currentIndex = currentIndex === learningItems.length - 1 ? 0 : currentIndex + 1;
+            } else {
+                currentIndex = getNextRandomIndex(currentIndex);
+            }
+            
+            updateLearningContent();
+        }
+
+        // 初始化应用
+        function initApp() {
+            initLocalStorage();
+            renderUnitSelection();
+            initEventListeners();
+            navigateTo('unitSelection');
+        }
+
+        // 启动应用
+        window.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
