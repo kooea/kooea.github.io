@@ -750,33 +750,7 @@
                 </a>
             </div>
             <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
-            <nav id="mainNav">
-                <div class="nav-item active" data-subject="chinese">
-                    语文
-                    <div class="dropdown">
-                        <div class="dropdown-item">看拼音写汉字</div>
-                        <div class="dropdown-item">阅读理解</div>
-                        <div class="dropdown-item">作文素材</div>
-                    </div>
-                </div>
-                <div class="nav-item" data-subject="math">
-                    数学
-                    <div class="dropdown">
-                        <div class="dropdown-item" onclick="window.location.href='add_sub.html'">加减法练习题</div>
-                        <div class="dropdown-item" onclick="window.location.href='mult.html'">乘法练习题</div>
-                        <div class="dropdown-item">除法练习题</div>
-                        <div class="dropdown-item">综合运算</div>
-                    </div>
-                </div>
-                <div class="nav-item" data-subject="english">
-                    英语
-                    <div class="dropdown">
-                        <div class="dropdown-item">单词默写</div>
-                        <div class="dropdown-item">短文填空</div>
-                        <div class="dropdown-item">翻译练习</div>
-                    </div>
-                </div>
-            </nav>
+            <nav id="mainNav"></nav>
         </div>
     </header>
 
@@ -920,6 +894,7 @@
         }
     </script>
 
+    <script src="navigation.js"></script>
     <script>
         let problemsCache = [];
         let selectedPages = 0;
@@ -1250,15 +1225,6 @@
                 yearSpan.textContent = new Date().getFullYear();
             }
             updateRangeOptions(true);
-        });
-
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', function(e) {
-                if (!e.target.classList.contains('dropdown-item')) {
-                    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-                    this.classList.add('active');
-                }
-            });
         });
 
         function toggleMobileMenu() {
