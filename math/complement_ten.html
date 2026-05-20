@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="优学习 - 专业的学习资料生成平台，免费提供数学凑十法练习题生成工具，支持自定义题型、难度、数量，一键打印。">
+    <meta name="keywords" content="学习资料生成器,凑十法练习题,数学练习题,优学习,在线打印">
+    <meta name="author" content="优学习">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#1a1a2e">
+
+    <title>优学习 - 习惯是最好的老师 | 凑十法练习题</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: linear-gradient(90deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 0 20px;
+        }
+
+        .logo-title {
+            padding: 15px 0;
+        }
+
+        .main-title {
+            font-size: 26px;
+            font-weight: bold;
+            background: linear-gradient(90deg, #00d9ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 3px;
+            margin-right: 15px;
+        }
+
+        .sub-title {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            letter-spacing: 1px;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            margin-left: 60px;
+        }
+
+        .nav-item {
+            position: relative;
+            padding: 20px 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .nav-item.active {
+            background: rgba(0,217,255,0.2);
+            border-bottom: 3px solid #00d9ff;
+        }
+
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: #1a1a2e;
+            min-width: 200px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            border-radius: 0 0 10px 10px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover .dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            padding: 12px 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(0,217,255,0.2);
+            border-left-color: #00d9ff;
+            padding-left: 30px;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        main {
+            flex: 1;
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+            width: 100%;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+            overflow-x: auto;
+        }
+
+        .preview-section {
+            flex: 1;
+            min-width: 0;
+            overflow-x: auto;
+        }
+
+        #paperContainer {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .paper-preview {
+            width: 794px;
+            height: 1123px;
+            background: white;
+            padding: 57px 45px;
+            font-size: 14px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            margin: 0 auto;
+            box-sizing: border-box;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .paper-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .paper-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            font-size: 14px;
+            color: #666;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        .info-name {
+            padding-left: 50px;
+        }
+
+        .info-date {
+            padding-right: 50px;
+        }
+
+        .problems-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px 17px;
+        }
+
+        .problem-item {
+            text-align: center;
+            padding: 8px 4px;
+            font-size: 16px;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .paper-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: absolute;
+            bottom: 35px;
+            left: 45px;
+            right: 45px;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .paper-footer .website-url {
+            flex: 1;
+            text-align: left;
+        }
+
+        .paper-footer .page-number {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .paper-footer .unique-id {
+            flex: 1;
+            text-align: right;
+        }
+
+        .complement-box {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 14px;
+            line-height: 1.3;
+        }
+
+        .complement-top {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .complement-wedge {
+            font-size: 20px;
+            color: #333;
+            line-height: 1;
+            margin: 1px 0;
+        }
+
+        .complement-middle {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .complement-middle span {
+            display: inline-block;
+            width: 20px;
+            text-align: center;
+        }
+
+        .complement-split {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .complement-arrow {
+            font-size: 12px;
+            color: #333;
+            margin-top: 2px;
+        }
+
+        .complement-add-line {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-left: 4px;
+        }
+
+        .complement-ten {
+            font-size: 14px;
+            color: #333;
+            border-bottom: 1px solid #333;
+            padding-bottom: 1px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .config-section {
+            width: 350px;
+            flex-shrink: 0;
+        }
+
+        .panel {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            background: linear-gradient(90deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 20px 25px;
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-body {
+            padding: 25px;
+        }
+
+        .config-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .config-label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .select-group {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .select-group:focus {
+            outline: none;
+            border-color: #4a90d9;
+            box-shadow: 0 0 0 3px rgba(74,144,217,0.1);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-generate {
+            background: linear-gradient(135deg, #4a90d9 0%, #357abd 100%);
+            color: white;
+        }
+
+        .btn-generate:hover {
+            background: linear-gradient(135deg, #357abd 0%, #2a6ab8 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74,144,217,0.3);
+        }
+
+        .btn-print {
+            background: linear-gradient(135deg, #67d9a7 0%, #4aba8a 100%);
+            color: white;
+        }
+
+        .btn span {
+            display: inline-flex;
+            align-items: center;
+            vertical-align: middle;
+        }
+
+        .btn-print:hover {
+            background: linear-gradient(135deg, #4aba8a 0%, #3da077 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74,144,217,0.3);
+        }
+
+        .tips-section {
+            margin-top: 20px;
+        }
+
+        .tips-panel {
+            background: #fff3e0;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #ffe0b2;
+        }
+
+        .tips-header {
+            background: linear-gradient(90deg, #ff9800 0%, #f57c00 100%);
+            color: white;
+            padding: 15px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tips-body {
+            padding: 20px;
+            color: #5d4037;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .ten-method-explain {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #495057;
+            line-height: 1.8;
+        }
+
+        .ten-method-explain strong {
+            color: #e67e22;
+        }
+
+        footer {
+            background: #1a1a2e;
+            color: rgba(255,255,255,0.6);
+            text-align: center;
+            padding: 20px;
+            font-size: 14px;
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 80px;
+            width: 50px;
+            height: 50px;
+            background: #43a047;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .back-to-top svg {
+            width: 24px;
+            height: 24px;
+            stroke: white;
+            stroke-width: 2.5;
+            fill: none;
+        }
+
+        @media (max-width: 900px) {
+            .content-wrapper {
+                flex-direction: column;
+            }
+
+            .config-section {
+                width: 100%;
+            }
+
+            .paper-preview {
+                width: 100%;
+                height: auto;
+                min-height: 600px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            nav {
+                display: none;
+            }
+        }
+
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 0;
+            }
+
+            html, body {
+                margin: 0;
+                padding: 0;
+                width: 794px;
+                height: auto;
+            }
+
+            body {
+                background: white;
+            }
+
+            header, footer, .config-section, .mobile-menu-btn {
+                display: none !important;
+            }
+
+            main {
+                margin: 0;
+                padding: 0;
+                max-width: none;
+                width: 794px;
+            }
+
+            .content-wrapper {
+                display: block;
+            }
+
+            .preview-section {
+                width: 100%;
+                max-width: none;
+            }
+
+            .panel {
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            #paperContainer {
+                display: block;
+            }
+
+            .paper-preview {
+                width: 794px;
+                height: 1123px;
+                margin: 0;
+                border: none;
+                box-shadow: none;
+                padding: 57px 45px;
+                box-sizing: border-box;
+                overflow: hidden;
+                position: relative;
+            }
+
+            .paper-preview:last-child {
+                page-break-after: auto;
+            }
+
+            .problems-grid {
+                gap: 10px 17px;
+            }
+
+            .problem-item {
+                padding: 8px 4px;
+            }
+
+            .paper-footer {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                position: absolute;
+                bottom: 20px;
+                left: 45px;
+                right: 45px;
+                font-size: 12px;
+                color: #999;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo-title">
+                <a href="../index.html" style="text-decoration: none;">
+                    <span class="main-title">优学习</span>
+                    <span class="sub-title">习惯是最好的老师</span>
+                </a>
+            </div>
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
+            <nav id="mainNav"></nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="content-wrapper">
+            <article class="preview-section" aria-label="学习资料预览区域">
+                <h1 style="position: absolute; left: -9999px;">优学习 - 凑十法练习题生成器</h1>
+                <div id="paperContainer">
+                    <div class="paper-preview" id="paperPreview">
+                        <div class="paper-title" id="paperTitle">凑十法练习题</div>
+                        <div class="paper-info">
+                            <span class="info-name">姓名: ____________</span>
+                            <span class="info-class">班级: ____________</span>
+                            <span class="info-date">日期: ____________</span>
+                        </div>
+                        <div class="problems-grid" id="problemsGrid" role="grid" aria-label="练习题列表">
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <aside class="config-section" aria-label="功能配置区域">
+                <div class="panel">
+                    <div class="panel-header">
+                        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="currentColor" stroke-width="2"/></svg></span> 功能配置
+                    </div>
+                    <div class="panel-body">
+                        <div class="config-group">
+                            <div class="config-label" id="quantityLabel">题目页数（每页24题）</div>
+                            <select id="quantitySelect" class="select-group">
+                                <option value="">请选择</option>
+                                <option value="1">1页</option>
+                                <option value="2" selected>2页</option>
+                                <option value="3">3页</option>
+                                <option value="4">4页</option>
+                                <option value="5">5页</option>
+                                <option value="6">6页</option>
+                                <option value="7">7页</option>
+                                <option value="8">8页</option>
+                                <option value="9">9页</option>
+                                <option value="10">10页</option>
+                            </select>
+                        </div>
+
+                        <div class="btn-group">
+                            <button class="btn btn-generate" onclick="generateProblems()">
+                                <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span> 生成题目
+                            </button>
+                            <button class="btn btn-print" onclick="printPaper()">
+                                <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><polyline points="6 9 6 2 18 2 18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="6" y="14" width="12" height="8" stroke="currentColor" stroke-width="2"/></svg></span> 打印题目
+                            </button>
+                        </div>
+
+                        <div class="ten-method-explain">
+                            <strong>凑十法：</strong>利用"凑十"的思路，把一个加数分成两部分，与另一个加数先凑成十，再加剩下的数。例如：8 + 5 = 8 + 2 + 5 = 10 + 3 = 13
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tips-section">
+                    <div class="tips-panel">
+                        <div class="tips-header">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 18h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M10 22h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> 温馨提示
+                        </div>
+                        <div class="tips-body">
+                            家长批改作业可以使用豆包爱学、作业帮等工具快速扫描批改哦，省心又省力，孩子的进步离不开家长的陪伴与鼓励，坚信习惯是最好的老师！
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <footer>
+        <p>Copyright © <span id="current-year">2026</span> Youxuexi. All Rights Reserved</p>
+    </footer>
+
+    <button class="back-to-top" id="backToTop" onclick="scrollToTop()">
+        <svg viewBox="0 0 24 24">
+            <polyline points="18 15 12 9 6 15"></polyline>
+        </svg>
+    </button>
+
+    <script src="../js/navigation.js"></script>
+    <script>
+        let savedDynamicTitle = '';
+        let baseId = '';
+
+        function generateProblems() {
+            const pages = parseInt(document.getElementById('quantitySelect').value);
+
+            if (!pages) {
+                alert('请选择题目页数');
+                return;
+            }
+
+            const problemsPerPage = 24;
+
+            savedDynamicTitle = '凑十法练习题';
+
+            const now = new Date();
+            baseId = now.getFullYear().toString().slice(-2) +
+                     String(now.getMonth() + 1).padStart(2, '0') +
+                     String(now.getDate()).padStart(2, '0') +
+                     String(now.getHours()).padStart(2, '0') +
+                     String(now.getMinutes()).padStart(2, '0') +
+                     String(now.getSeconds()).padStart(2, '0');
+
+            const problemsCache = [];
+
+            for (let page = 0; page < pages; page++) {
+                const pageProblems = [];
+                const usedInPage = new Set();
+
+                for (let i = 0; i < problemsPerPage; i++) {
+                    let num1, num2;
+                    let attempts = 0;
+                    const maxAttempts = 100;
+
+                    do {
+                        num1 = Math.floor(Math.random() * 9) + 1;
+                        num2 = Math.floor(Math.random() * 9) + 1;
+                        attempts++;
+                    } while (num1 + num2 <= 10 || (attempts < maxAttempts && usedInPage.has(`${num1},${num2}`)));
+
+                    usedInPage.add(`${num1},${num2}`);
+
+                    const result = num1 + num2;
+                    const part2 = 10 - num2;
+                    const part1 = num1 - part2;
+                    pageProblems.push({
+                        num1,
+                        num2,
+                        result,
+                        part1,
+                        part2,
+                        displayText: `${num1} + ${num2} = `
+                    });
+                }
+
+                problemsCache.push(...pageProblems);
+            }
+
+            renderProblems(problemsCache, pages);
+        }
+
+        function renderProblems(problemsCache, totalPages) {
+            const container = document.getElementById('paperContainer');
+            const problemsPerPage = 24;
+
+            container.innerHTML = '';
+
+            for (let page = 0; page < totalPages; page++) {
+                const pagePaper = document.createElement('div');
+                pagePaper.className = 'paper-preview';
+                const pageUniqueId = `${baseId}${page + 1}`;
+
+                const start = page * problemsPerPage;
+                const end = start + problemsPerPage;
+                const pageProblems = problemsCache.slice(start, end);
+
+                let problemsHTML = pageProblems.map(p => {
+                    return `
+                        <div class="problem-item">
+                            <div style="font-size: 16px; text-align: center; line-height: 1.4;">
+                                <table style="border-collapse: collapse; margin: 0 auto;">
+                                    <tr>
+                                        <td style="width: 30px; text-align: center; position: relative;">
+                                            <span>${p.num1}</span>
+                                            <svg width="55" height="80" style="position: absolute; top: 20px; left: 5px;">
+                                                <polyline points="10,2 10,65 40,65 40,59" fill="none" stroke="#333" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                        </td>
+                                        <td style="width: 20px; text-align: center;">+</td>
+                                        <td style="width: 30px; text-align: center;">${p.num2}</td>
+                                        <td style="width: 20px; text-align: center;">=</td>
+                                        <td style="width: 50px; text-align: center;">____</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2"></td>
+                                        <td style="text-align: center; vertical-align: middle; line-height: 14px;"><svg width="30" height="18" style="vertical-align: middle; display: block; margin: 0 auto;"><polyline points="5,16 15,2 25,16" fill="none" stroke="#333" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4">
+                                            <div style="display: flex; justify-content: center; align-items: center; gap: 4px; padding: 4px 0;">
+                                                <span style="width: 25px;"></span>
+                                                <span style="display: inline-block; width: 30px; height: 30px; border: 1px solid #333;"></span>
+                                                <span style="display: inline-block; width: 30px; height: 30px; border: 1px solid #333;"></span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4">
+                                            <div style="display: flex; justify-content: flex-start; align-items: center; padding: 13px 0 0 0;">
+                                                <span style="display: inline-block; width: 30px; height: 30px; border: 1px solid #333; margin-left: 15px;"></span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                pagePaper.innerHTML = `
+                    <div class="paper-title">${savedDynamicTitle}</div>
+                    <div class="paper-info">
+                        <span class="info-name">姓名: ____________</span>
+                        <span class="info-class">班级: ____________</span>
+                        <span class="info-date">日期: ____________</span>
+                    </div>
+                    <div class="problems-grid">
+                        ${problemsHTML}
+                    </div>
+                    <div class="paper-footer">
+                        <span class="website-url">© 优学习 www.youxuexi.com</span>
+                        <span class="page-number">第 ${page + 1} 页</span>
+                        <span class="unique-id">编号: ${pageUniqueId}</span>
+                    </div>
+                `;
+
+                container.appendChild(pagePaper);
+            }
+        }
+
+        function printPaper() {
+            window.print();
+        }
+
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        window.addEventListener('scroll', function() {
+            const backToTopBtn = document.getElementById('backToTop');
+            if (window.scrollY > 300) {
+                backToTopBtn.classList.add('visible');
+            } else {
+                backToTopBtn.classList.remove('visible');
+            }
+        });
+
+        function positionBackToTopBtn() {
+            const configSection = document.querySelector('.config-section');
+            const backToTopBtn = document.getElementById('backToTop');
+
+            if (configSection && backToTopBtn) {
+                const rect = configSection.getBoundingClientRect();
+                backToTopBtn.style.left = rect.left + 'px';
+            }
+        }
+
+        window.addEventListener('load', function() {
+            loadNavigation();
+            positionBackToTopBtn();
+        });
+
+        window.addEventListener('resize', positionBackToTopBtn);
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const yearSpan = document.getElementById('current-year');
+            if (yearSpan) {
+                yearSpan.textContent = new Date().getFullYear();
+            }
+        });
+    </script>
+</body>
+</html>
