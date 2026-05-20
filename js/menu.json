@@ -1,1 +1,36 @@
-
+{
+  "menu": [
+    {
+      "id": "chinese",
+      "name": "语文",
+      "items": [
+        { "name": "看拼音写汉字", "url": "#" },
+        { "name": "阅读理解", "url": "#" },
+        { "name": "作文素材", "url": "#" }
+      ]
+    },
+    {
+      "id": "math",
+      "name": "数学",
+      "items": [
+        { "name": "凑十法练习题", "url": "math/complement_ten.html" },
+        { "name": "破十法练习题", "url": "math/break_ten.html" },
+        { "name": "平十法练习题", "url": "math/flatten_ten.html" },
+        { "name": "借十法练习题", "url": "math/borrow_ten.html" },
+        { "name": "加减法练习题", "url": "math/add_sub.html" },
+        { "name": "乘法练习题", "url": "math/mult.html" },
+        { "name": "除法练习题", "url": "math/div.html" },
+        { "name": "综合运算练习题", "url": "math/mixed_operations.html" }
+      ]
+    },
+    {
+      "id": "english",
+      "name": "英语",
+      "items": [
+        { "name": "单词默写", "url": "#" },
+        { "name": "短文填空", "url": "#" },
+        { "name": "翻译练习", "url": "#" }
+      ]
+    }
+  ]
+}
