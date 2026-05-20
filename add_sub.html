@@ -984,6 +984,8 @@
             const range = parseInt(rangeValue);
             problemsCache = [];
             const digits = problemType.split('-').map(Number);
+            const usedProblems = new Set();
+            const generatedProblems = [];
 
             const getRandomByDigits = (d) => {
                 const min = Math.pow(10, d - 1);
@@ -1005,11 +1007,12 @@
             let addGenerated = 0;
             let subGenerated = 0;
 
-            for (let i = 0; i < quantity; i++) {
+            while (generatedProblems.length < quantity) {
                 let num1, num2, result;
                 let attempts = 0;
-                const maxAttempts = 500;
+                const maxAttempts = 100;
                 let isValid = false;
+                let foundNew = false;
                 let currentOp;
 
                 if (operationType === 'mixed') {
@@ -1043,21 +1046,32 @@
                                   validateResult(result, range);
                     }
                     attempts++;
-                }
 
-                let displayText;
-                if (!isValid) {
-                    if (currentOp === '+') {
-                        num1 = Math.min(getRandomByDigits(digits[0]), Math.floor(range / 2));
-                        num2 = Math.min(getRandomByDigits(digits[1]), range - num1);
-                        result = num1 + num2;
-                    } else {
-                        num1 = getRandomByDigits(digits[0]);
-                        num2 = Math.min(getRandomByDigits(digits[1]), num1, range);
-                        result = num1 - num2;
+                    if (isValid) {
+                        const problemKey = `${num1}-${currentOp}-${num2}`;
+                        if (!usedProblems.has(problemKey)) {
+                            usedProblems.add(problemKey);
+                            generatedProblems.push({ num1, num2, operator: currentOp, result });
+                            foundNew = true;
+                            addGenerated = currentOp === '+' ? addGenerated + 1 : addGenerated;
+                            subGenerated = currentOp === '-' ? subGenerated + 1 : subGenerated;
+                            break;
+                        }
                     }
                 }
 
+                if (!foundNew && generatedProblems.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * generatedProblems.length);
+                    const randomProblem = generatedProblems[randomIndex];
+                    generatedProblems.push({ ...randomProblem });
+                    addGenerated = randomProblem.operator === '+' ? addGenerated + 1 : addGenerated;
+                    subGenerated = randomProblem.operator === '-' ? subGenerated + 1 : subGenerated;
+                }
+            }
+
+            for (const problem of generatedProblems) {
+                const { num1, num2, operator: currentOp, result } = problem;
+                let displayText;
                 if (problemMode === 'fill') {
                     const hideFirst = Math.random() < 0.5;
                     if (currentOp === '+') {
@@ -1107,8 +1121,6 @@
                 }
 
                 problemsCache.push({ num1, num2, operator: currentOp, result, displayText, displayHTML, digitCount: digits[0] });
-                addGenerated = currentOp === '+' ? addGenerated + 1 : addGenerated;
-                subGenerated = currentOp === '-' ? subGenerated + 1 : subGenerated;
             }
 
             const container = document.getElementById('paperContainer');
