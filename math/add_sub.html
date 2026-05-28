@@ -494,6 +494,31 @@
             box-shadow: 0 0 0 3px rgba(67, 160, 71, 0.2);
         }
 
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            background: #f5f6fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            gap: 8px;
+        }
+
+        .checkbox-label:hover {
+            border-color: #43a047;
+            background: #f0f9f0;
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #43a047;
+            cursor: pointer;
+        }
+
         .btn-group {
             display: flex;
             gap: 10px;
@@ -770,13 +795,23 @@
                             <select id="problemType" class="select-group" onchange="updateRangeOptions(true)">
                                 <option value="">请选择</option>
                                 <option value="1-1">1位数与1位数</option>
-                                <option value="1-2">1位数与2位数</option>
                                 <option value="2-1">2位数与1位数</option>
                                 <option value="2-2" selected>2位数与2位数</option>
-                                <option value="2-3">2位数与3位数</option>
                                 <option value="3-2">3位数与2位数</option>
                                 <option value="3-3">3位数与3位数</option>
                             </select>
+                        </div>
+
+                        <div class="config-group">
+                            <div class="config-label">进位/退位选项</div>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="carryOption"> 加法进位
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="borrowOption"> 减法退位
+                                </label>
+                            </div>
                         </div>
 
                         <div class="config-group">
@@ -967,6 +1002,8 @@
             const problemsPerPage = problemMode === 'vertical' ? 28 : 60;
             const quantity = pages * problemsPerPage;
             selectedPages = pages;
+            const carryOption = document.getElementById('carryOption').checked;
+            const borrowOption = document.getElementById('borrowOption').checked;
 
             // 获取配置选项的文本
             const operationTypeText = document.querySelector('#operationType option:checked')?.textContent || '';
@@ -1009,6 +1046,47 @@
                 return result >= 0 && result <= maxRange;
             };
 
+            const validateCarry = (n1, n2) => {
+                const s1 = n1.toString().padStart(digits[0], '0');
+                const s2 = n2.toString().padStart(digits[1], '0');
+                const maxLen = Math.max(s1.length, s2.length);
+                let carryCount = 0;
+                let carryBit = 0;
+                for (let i = 0; i < maxLen; i++) {
+                    const d1 = parseInt(s1[s1.length - 1 - i]) || 0;
+                    const d2 = parseInt(s2[s2.length - 1 - i]) || 0;
+                    const sum = d1 + d2 + carryBit;
+                    if (sum >= 10) {
+                        carryCount++;
+                        carryBit = 1;
+                    } else {
+                        carryBit = 0;
+                    }
+                }
+                return carryCount >= 2;
+            };
+
+            const validateBorrow = (n1, n2) => {
+                if (digits[0] === 1) return true;
+                const s1 = n1.toString().padStart(digits[0], '0');
+                const s2 = n2.toString().padStart(digits[1], '0');
+                const maxLen = Math.max(s1.length, s2.length);
+                let borrowCount = 0;
+                let borrowBit = 0;
+                for (let i = 0; i < maxLen; i++) {
+                    const d1 = parseInt(s1[s1.length - 1 - i]) || 0;
+                    const d2 = parseInt(s2[s2.length - 1 - i]) || 0;
+                    const diff = d1 - borrowBit - d2;
+                    if (diff < 0) {
+                        borrowCount++;
+                        borrowBit = 1;
+                    } else {
+                        borrowBit = 0;
+                    }
+                }
+                return borrowCount >= 2;
+            };
+
             const addCount = operationType === 'mixed' ? Math.ceil(quantity / 2) : quantity;
             const subCount = operationType === 'mixed' ? Math.floor(quantity / 2) : 0;
             let addGenerated = 0;
@@ -1043,14 +1121,16 @@
                         result = num1 + num2;
                         isValid = validateDigits(num1, digits[0]) &&
                                   validateDigits(num2, digits[1]) &&
-                                  validateResult(result, range);
+                                  validateResult(result, range) &&
+                                  (!carryOption || validateCarry(num1, num2));
                     } else {
                         num1 = getRandomByDigits(digits[0]);
                         num2 = getRandomByDigits(digits[1]);
                         result = num1 - num2;
                         isValid = validateDigits(num1, digits[0]) &&
                                   validateDigits(num2, digits[1]) &&
-                                  validateResult(result, range);
+                                  validateResult(result, range) &&
+                                  (!borrowOption || validateBorrow(num1, num2));
                     }
                     attempts++;
 
